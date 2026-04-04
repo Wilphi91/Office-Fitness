@@ -116,6 +116,9 @@ body::before { content: ''; position: fixed; inset: 0; background: repeating-lin
 .toast.urgent { background: #ff4f6d; color: #fff; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
 .fadein { animation: fadeIn .25s ease forwards; }
+.timer-preset-btn { flex:1; min-width:52px; padding:7px 4px; background:#111116; border:1px solid #1e1e28; color:#4a4a5a; font-family:'Share Tech Mono','Courier New',Courier,monospace; font-size:10px; letter-spacing:1px; cursor:pointer; }
+.timer-preset-btn.active { border-color:#b47fff; color:#b47fff; background:rgba(180,127,255,.08); }
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
 </style>
 </head>
 <body>
@@ -195,6 +198,24 @@ body::before { content: ''; position: fixed; inset: 0; background: repeating-lin
           </div>
         </div>
         <div class="timer-meta" id="timerMeta">-</div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:9px;color:#4a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">// NAECHSTEN TIMER ANPASSEN</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;" id="timerPresets">
+          <button class="timer-preset-btn active" onclick="setNextDuration(30)">30 Min</button>
+          <button class="timer-preset-btn" onclick="setNextDuration(45)">45 Min</button>
+          <button class="timer-preset-btn" onclick="setNextDuration(60)">60 Min</button>
+          <button class="timer-preset-btn" onclick="setNextDuration(90)">90 Min</button>
+          <button class="timer-preset-btn" onclick="setNextDuration(120)">2 Std</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:9px;color:#4a4a5a;white-space:nowrap;">Eigene:</div>
+          <input type="number" id="customMinutes" min="5" max="240" placeholder="Min" style="flex:1;background:#0a0a0c;border:1px solid #1e1e28;color:#fff;padding:7px 10px;font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:14px;width:100%;" oninput="setCustomDuration(this.value)">
+          <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:9px;color:#4a4a5a;">MIN</div>
+        </div>
+        <div style="margin-top:8px;">
+          <button onclick="openClockApp()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(71,212,255,.3);color:#47d4ff;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;cursor:pointer;">&#x23F0; IN UHRZEIT-APP OEFFNEN</button>
+        </div>
       </div>
       <div class="btn-row">
         <button class="btn btn-teal" onclick="startInputPhase()">+ JETZT SET</button>
@@ -287,6 +308,8 @@ body::before { content: ''; position: fixed; inset: 0; background: repeating-lin
 
 <script>
 var TIMER_SEC = 3600;
+var nextTimerSec = 3600;
+var currentTimerTotal = 3600;
 var CIRC = 452;
 var S = { sq:15, gm:15, pl:45, sets:[], phase:'start', timerInterval:null, timerRemaining:3600, nextSetTime:null };
 var chartEx = 'sq';
@@ -363,8 +386,8 @@ function logSet() {
   var now = new Date();
   S.sets.push({ n: S.sets.length+1, sq:S.sq, gm:S.gm, pl:S.pl, time: now.toTimeString().slice(0,5) });
   updateLiveStats(); renderTodayLog(); updateBadge();
-  S.nextSetTime = new Date(now.getTime() + TIMER_SEC * 1000);
-  showPhase('timer'); startTimer(TIMER_SEC); saveToday();
+  S.nextSetTime = new Date(now.getTime() + nextTimerSec * 1000);
+  showPhase('timer'); startTimer(nextTimerSec, TIMER_SEC); saveToday();
   showToast('Set #' + S.sets.length + ' gespeichert!');
 }
 
@@ -376,7 +399,11 @@ function updateLiveStats() {
   document.getElementById('livePl').textContent = pl + 's';
 }
 
-function startTimer(secs) {
+function startTimer(secs, totalSecs) {
+  if (!totalSecs) totalSecs = secs;
+  currentTimerTotal = totalSecs;
+  requestNotifPermission();
+  scheduleNotif(secs);
   stopTimer();
   S.timerRemaining = secs;
   updateTimerUI(secs);
@@ -396,6 +423,7 @@ function startTimer(secs) {
 
 function stopTimer() {
   if (S.timerInterval) { clearInterval(S.timerInterval); S.timerInterval = null; }
+  if (window._notifTimer) { clearTimeout(window._notifTimer); window._notifTimer = null; }
   document.getElementById('ringFg').classList.remove('urgent');
 }
 
@@ -404,7 +432,7 @@ function updateTimerUI(secs) {
   var m = String(Math.floor(secs/60)).length < 2 ? '0'+Math.floor(secs/60) : String(Math.floor(secs/60));
   var s = String(secs%60).length < 2 ? '0'+String(secs%60) : String(secs%60);
   document.getElementById('timerDisplay').textContent = m + ':' + s;
-  document.getElementById('ringFg').style.strokeDashoffset = String(CIRC * (1 - secs/TIMER_SEC));
+  document.getElementById('ringFg').style.strokeDashoffset = String(CIRC * (1 - secs/currentTimerTotal));
 }
 
 function renderTodayLog() {
@@ -650,6 +678,75 @@ function injectManifest() {
     document.head.appendChild(link);
   } catch(e) {}
 }
+
+function setNextDuration(minutes) {
+  nextTimerSec = minutes * 60;
+  var btns = document.getElementById('timerPresets').getElementsByTagName('button');
+  for (var i=0; i<btns.length; i++) {
+    btns[i].className = 'timer-preset-btn';
+  }
+  // find matching preset
+  var presets = [30,45,60,90,120];
+  for (var i=0; i<presets.length; i++) {
+    if (presets[i] === minutes) {
+      btns[i].className = 'timer-preset-btn active';
+      break;
+    }
+  }
+  document.getElementById('customMinutes').value = '';
+  showToast('Naechster Timer: ' + minutes + ' Min');
+}
+
+function setCustomDuration(val) {
+  var mins = parseInt(val);
+  if (!mins || mins < 1) return;
+  if (mins > 480) mins = 480;
+  nextTimerSec = mins * 60;
+  // deactivate presets
+  var btns = document.getElementById('timerPresets').getElementsByTagName('button');
+  for (var i=0; i<btns.length; i++) btns[i].className = 'timer-preset-btn';
+}
+
+function openClockApp() {
+  var mins = Math.round(nextTimerSec / 60);
+  var hours = Math.floor(mins / 60);
+  var remainMins = mins % 60;
+  // iOS clock deeplink
+  var url = 'clock-alarm://?display=create&type=timer&hours=' + hours + '&minutes=' + remainMins;
+  window.location.href = url;
+  // Fallback after short delay
+  setTimeout(function() {
+    window.open('clock://', '_blank');
+  }, 500);
+}
+
+
+function requestNotifPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission(function(result) {
+      if (result === 'granted') showToast('Benachrichtigungen aktiviert!');
+    });
+  }
+}
+
+function scheduleNotif(secs) {
+  if (window._notifTimer) clearTimeout(window._notifTimer);
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  window._notifTimer = setTimeout(function() {
+    try {
+      var n = new Notification('Hourly Sets', {
+        body: 'Zeit fuer dein naechstes Set!',
+        icon: '',
+        tag: 'hourly-set',
+        requireInteraction: true
+      });
+      n.onclick = function() { window.focus(); n.close(); };
+    } catch(e) {}
+    window._notifTimer = null;
+  }, secs * 1000);
+}
+
 
 function init() {
   document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'}).toUpperCase();
