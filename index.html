@@ -194,7 +194,6 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
           </svg>
           <div class="timer-center">
             <div class="timer-time" id="timerDisplay">60:00</div>
-            <div class="timer-lbl">BIS ZUM NAECHSTEN SET</div>
           </div>
         </div>
         <div class="timer-meta" id="timerMeta">-</div>
@@ -213,34 +212,35 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
           <input type="number" id="customMinutes" min="5" max="240" placeholder="Min" style="flex:1;background:#0a0a0c;border:1px solid #1e1e28;color:#fff;padding:7px 10px;font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:14px;width:100%;" oninput="setCustomDuration(this.value)">
           <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:9px;color:#4a4a5a;">MIN</div>
         </div>
-        <div style="margin-top:8px;">
-          <button onclick="openClockApp()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(71,212,255,.3);color:#47d4ff;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;cursor:pointer;">&#x23F0; IN UHRZEIT-APP OEFFNEN</button>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-teal" onclick="startInputPhase()">+ JETZT SET</button>
-        <button class="btn btn-danger" onclick="confirmEnd()">&#x23F9; FERTIG</button>
-      </div>
-    </div>
-    <div class="panel" id="panelSummary" style="display:none;">
-      <div class="panel-title">// Tages-Summary</div>
-      <div class="sum-grid">
-        <div class="sum-stat"><div class="sum-val" id="sumSets">0</div><div class="sum-lbl">Sets</div></div>
-        <div class="sum-stat"><div class="sum-val" style="color:#e8ff47;" id="sumSq">0</div><div class="sum-lbl">Squats</div></div>
-        <div class="sum-stat"><div class="sum-val" style="color:#47d4ff;" id="sumGm">0</div><div class="sum-lbl">Good M.</div></div>
-      </div>
-      <div class="sum-grid">
-        <div class="sum-stat" style="grid-column:1/3;"><div class="sum-val" style="color:#ff4f6d;" id="sumPl">0</div><div class="sum-lbl">Plank-Sekunden</div></div>
-        <div class="sum-stat"><div class="sum-val" style="font-size:13px;" id="sumSpan">-</div><div class="sum-lbl">Zeitraum</div></div>
-      </div>
-      <div class="export-box" id="exportText"></div>
-      <button class="btn btn-primary" onclick="copyExport()" style="margin-bottom:6px;">&#x2398; TEXT KOPIEREN</button>
-      <button class="btn btn-secondary" onclick="resetDay()">&#x21BA; NEUER TAG</button>
-    </div>
-    <div class="hist-panel">
-      <div class="hist-title">// LOG HEUTE</div>
-      <div id="historyList"><div class="hist-empty">Noch keine Sets - los geht's!</div></div>
-    </div>
+
+```
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-teal" onclick="startInputPhase()">+ JETZT SET</button>
+    <button class="btn btn-danger" onclick="confirmEnd()">&#x23F9; FERTIG</button>
+  </div>
+</div>
+<div class="panel" id="panelSummary" style="display:none;">
+  <div class="panel-title">// Tages-Summary</div>
+  <div class="sum-grid">
+    <div class="sum-stat"><div class="sum-val" id="sumSets">0</div><div class="sum-lbl">Sets</div></div>
+    <div class="sum-stat"><div class="sum-val" style="color:#e8ff47;" id="sumSq">0</div><div class="sum-lbl">Squats</div></div>
+    <div class="sum-stat"><div class="sum-val" style="color:#47d4ff;" id="sumGm">0</div><div class="sum-lbl">Good M.</div></div>
+  </div>
+  <div class="sum-grid">
+    <div class="sum-stat" style="grid-column:1/3;"><div class="sum-val" style="color:#ff4f6d;" id="sumPl">0</div><div class="sum-lbl">Plank-Sekunden</div></div>
+    <div class="sum-stat"><div class="sum-val" style="font-size:13px;" id="sumSpan">-</div><div class="sum-lbl">Zeitraum</div></div>
+  </div>
+  <div class="export-box" id="exportText"></div>
+  <button class="btn btn-primary" onclick="copyExport()" style="margin-bottom:6px;">&#x2398; TEXT KOPIEREN</button>
+  <button class="btn btn-secondary" onclick="resetDay()">&#x21BA; NEUER TAG</button>
+</div>
+<div class="hist-panel">
+  <div class="hist-title">// LOG HEUTE</div>
+  <div id="historyList"><div class="hist-empty">Noch keine Sets - los geht's!</div></div>
+</div>
+```
+
   </div>
 </div>
 
@@ -707,9 +707,6 @@ function setCustomDuration(val) {
   for (var i=0; i<btns.length; i++) btns[i].className = 'timer-preset-btn';
 }
 
-function openClockApp() {
-  window.location.href = 'clock-timer://';
-}
 
 
 function requestNotifPermission() {
