@@ -708,16 +708,7 @@ function setCustomDuration(val) {
 }
 
 function openClockApp() {
-  var mins = Math.round(nextTimerSec / 60);
-  var hours = Math.floor(mins / 60);
-  var remainMins = mins % 60;
-  // iOS clock deeplink
-  var url = 'clock-alarm://?display=create&type=timer&hours=' + hours + '&minutes=' + remainMins;
-  window.location.href = url;
-  // Fallback after short delay
-  setTimeout(function() {
-    window.open('clock://', '_blank');
-  }, 500);
+  window.location.href = 'clock-timer://';
 }
 
 
