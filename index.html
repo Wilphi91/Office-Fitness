@@ -13,193 +13,165 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;900&display=swap">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; background: #0a0a0c; color: #c8c8d8; font-family: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif; -webkit-user-select: none; user-select: none; }
-body::before { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(232,255,71,.025) 40px), repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(232,255,71,.015) 40px); pointer-events: none; z-index: 0; }
-.mono { font-family: 'Share Tech Mono', 'Courier New', Courier, monospace; }
-.tab-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: rgba(10,10,12,.96); border-top: 1px solid #1e1e28; display: grid; grid-template-columns: repeat(3,1fr); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.tab-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0 8px; background: none; border: none; color: #4a4a5a; cursor: pointer; font-family: 'Barlow Condensed','Arial Narrow',Arial,sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
-.tab-btn.active { color: #e8ff47; }
-.tab-btn .icon { font-size: 20px; line-height: 1; }
-.screen { display: none; position: fixed; inset: 0; padding-top: calc(env(safe-area-inset-top, 0px) + 12px); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 64px); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; z-index: 1; }
-.screen.active { display: block; }
-.scr-pad { padding: 0 14px; }
-.top-bar { display: flex; align-items: flex-end; justify-content: space-between; padding: 0 14px 12px; border-bottom: 1px solid #1e1e28; margin-bottom: 14px; }
-.top-bar h1 { font-weight: 900; font-size: 28px; letter-spacing: -1px; line-height: 1; color: #fff; text-transform: uppercase; }
-.top-date { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 9px; color: #4a4a5a; margin-top: 3px; letter-spacing: 1px; }
-.top-badge { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 10px; color: #e8ff47; background: rgba(232,255,71,.08); border: 1px solid rgba(232,255,71,.2); padding: 4px 10px; letter-spacing: 1px; }
-.live-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 14px; }
-.ls-card { background: #111116; border: 1px solid #1e1e28; padding: 10px 8px; text-align: center; position: relative; overflow: hidden; }
-.ls-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #e8ff47; }
-.ls-card.gm::after { background: #47d4ff; }
-.ls-card.pl::after { background: #ff4f6d; }
-.ls-val { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 24px; font-weight: 700; color: #fff; line-height: 1; }
-.ls-label { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 8px; color: #4a4a5a; letter-spacing: 1px; margin-top: 3px; text-transform: uppercase; }
-.panel { background: #111116; border: 1px solid #1e1e28; padding: 18px; margin-bottom: 12px; position: relative; }
-.panel::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: #e8ff47; }
-.panel.timer-accent::before { background: #b47fff; }
-.panel-title { font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #e8ff47; margin-bottom: 14px; }
-.panel.timer-accent .panel-title { color: #b47fff; }
-.ex-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; margin-bottom: 12px; }
-.ex-name { font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
-.ex-sub { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 9px; color: #4a4a5a; margin-top: 2px; }
-.ctrl { display: flex; align-items: center; gap: 4px; }
-.qty-btn { width: 38px; height: 38px; background: transparent; border: 1px solid #1e1e28; color: #c8c8d8; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: 'Share Tech Mono','Courier New',Courier,monospace; }
-.qty-btn:active { background: rgba(232,255,71,.1); border-color: #e8ff47; color: #e8ff47; }
-.qty-val { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 20px; color: #fff; min-width: 38px; text-align: center; font-weight: 700; }
-.unit { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 8px; color: #4a4a5a; letter-spacing: 1px; }
-.timer-wrap { display: flex; flex-direction: column; align-items: center; padding: 8px 0 16px; }
-.timer-ring { position: relative; width: 160px; height: 160px; }
-.timer-ring svg { transform: rotate(-90deg); position: absolute; top: 0; left: 0; }
-.ring-bg { fill: none; stroke: #1e1e28; stroke-width: 4; }
-.ring-fg { fill: none; stroke: #b47fff; stroke-width: 4; stroke-linecap: butt; stroke-dasharray: 452; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
-.ring-fg.urgent { stroke: #ff4f6d; }
-.timer-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.timer-time { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 32px; color: #fff; letter-spacing: 2px; line-height: 1; }
-.timer-lbl { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 8px; color: #4a4a5a; letter-spacing: 2px; margin-top: 3px; }
-.timer-meta { margin-top: 10px; font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 10px; color: #4a4a5a; letter-spacing: 1px; }
-.btn { display: block; width: 100%; padding: 14px; font-family: 'Barlow Condensed','Arial Narrow',Arial,sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; border: none; }
-.btn-primary { background: #e8ff47; color: #0a0a0c; }
-.btn-primary:active { background: #d4e840; }
-.btn-secondary { background: transparent; color: #c8c8d8; border: 1px solid #1e1e28; }
-.btn-teal { background: #47d4ff; color: #0a0a0c; }
-.btn-danger { background: transparent; color: #ff4f6d; border: 1px solid rgba(255,79,109,.3); font-size: 11px; padding: 11px; }
-.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-.divider { height: 1px; background: #1e1e28; margin: 8px 0 12px; }
-.hist-panel { background: #111116; border: 1px solid #1e1e28; padding: 14px; margin-bottom: 12px; }
-.hist-title { font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #4a4a5a; margin-bottom: 10px; }
-.hist-empty { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 11px; color: #4a4a5a; text-align: center; padding: 10px 0; }
-.set-entry { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
-.set-entry:last-child { border-bottom: none; }
-.set-num { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 9px; color: #4a4a5a; width: 24px; text-align: center; padding: 2px; background: rgba(255,255,255,.03); border: 1px solid #1e1e28; }
-.set-data { display: flex; gap: 5px; flex-wrap: wrap; }
-.chip { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 9px; padding: 2px 6px; border: 1px solid; }
-.chip.sq { color: #e8ff47; border-color: rgba(232,255,71,.2); background: rgba(232,255,71,.04); }
-.chip.gm { color: #47d4ff; border-color: rgba(71,212,255,.2); background: rgba(71,212,255,.04); }
-.chip.pl { color: #ff4f6d; border-color: rgba(255,79,109,.2); background: rgba(255,79,109,.04); }
-.set-time { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 9px; color: #4a4a5a; }
-.day-card { background: #111116; border: 1px solid #1e1e28; padding: 14px; margin-bottom: 10px; position: relative; cursor: pointer; }
-.day-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: #b47fff; }
-.day-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-.day-date { font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
-.day-sets { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 10px; color: #b47fff; letter-spacing: 1px; }
-.day-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
-.day-stat { text-align: center; }
-.day-stat-val { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 18px; color: #fff; font-weight: 700; }
-.day-stat-lbl { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 8px; color: #4a4a5a; letter-spacing: 1px; }
-.day-stat-val.sq { color: #e8ff47; }
-.day-stat-val.gm { color: #47d4ff; }
-.day-stat-val.pl { color: #ff4f6d; }
-.ex-sel-btn { flex: 1; padding: 8px 4px; background: #111116; border: 1px solid #1e1e28; color: #4a4a5a; font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 10px; letter-spacing: 1px; cursor: pointer; }
-.ex-sel-btn.sq-active { border-color: #e8ff47; color: #e8ff47; }
-.ex-sel-btn.gm-active { border-color: #47d4ff; color: #47d4ff; }
-.ex-sel-btn.pl-active { border-color: #ff4f6d; color: #ff4f6d; }
-.week-chart { background: #111116; border: 1px solid #1e1e28; padding: 14px; margin-bottom: 10px; }
-.week-bars { display: flex; align-items: flex-end; gap: 4px; height: 70px; margin-top: 10px; }
-.week-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; cursor: pointer; }
-.week-val { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 8px; color: #2a2a38; height: 12px; }
-.week-bar { width: 100%; border-radius: 2px 2px 0 0; min-height: 2px; }
-.week-lbl { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 8px; color: #4a4a5a; }
-.big-stat-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 14px; }
-.big-stat { background: #111116; border: 1px solid #1e1e28; padding: 14px; text-align: center; }
-.big-stat-val { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 30px; color: #fff; font-weight: 700; line-height: 1; }
-.big-stat-lbl { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 8px; color: #4a4a5a; letter-spacing: 1px; margin-top: 4px; text-transform: uppercase; }
-.streak-bar { background: #111116; border: 1px solid #1e1e28; padding: 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
-.stat-section-title { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 9px; letter-spacing: 3px; color: #4a4a5a; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #1e1e28; }
-.sum-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 10px; }
-.sum-stat { background: rgba(255,255,255,.02); border: 1px solid #1e1e28; padding: 10px 6px; text-align: center; }
-.sum-val { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 22px; color: #fff; font-weight: 700; line-height: 1; }
-.sum-lbl { font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 8px; color: #4a4a5a; letter-spacing: 1px; margin-top: 3px; text-transform: uppercase; }
-.export-box { background: rgba(0,0,0,.4); border: 1px solid #1e1e28; padding: 12px; font-family: 'Share Tech Mono','Courier New',Courier,monospace; font-size: 9px; color: #4a4a5a; white-space: pre; overflow-x: auto; margin-bottom: 10px; line-height: 1.8; }
-.toast { position: fixed; top: 0; left: 0; right: 0; background: #e8ff47; color: #0a0a0c; text-align: center; padding: 13px; font-family: 'Barlow Condensed','Arial Narrow',Arial,sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; z-index: 999; transform: translateY(-100%); transition: transform .4s cubic-bezier(.16,1,.3,1); }
-.toast.show { transform: translateY(0); }
-.toast.urgent { background: #ff4f6d; color: #fff; }
-@keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
-.fadein { animation: fadeIn .25s ease forwards; }
-.timer-preset-btn { flex:1; min-width:52px; padding:7px 4px; background:#111116; border:1px solid #1e1e28; color:#4a4a5a; font-family:'Share Tech Mono','Courier New',Courier,monospace; font-size:10px; letter-spacing:1px; cursor:pointer; }
-.timer-preset-btn.active { border-color:#b47fff; color:#b47fff; background:rgba(180,127,255,.08); }
-input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#0a0a0c;color:#c8c8d8;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;-webkit-user-select:none;user-select:none;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(232,255,71,.025) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(232,255,71,.015) 40px);pointer-events:none;z-index:0;}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(10,10,12,.96);border-top:1px solid #1e1e28;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom,0px);}
+.tab-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 0 7px;background:none;border:none;color:#4a4a5a;cursor:pointer;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;}
+.tab-btn.active{color:#e8ff47;}
+.tab-btn .icon{font-size:18px;line-height:1;}
+.screen{display:none;position:fixed;inset:0;padding-top:calc(env(safe-area-inset-top,0px) + 12px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 60px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;z-index:1;}
+.screen.active{display:block;}
+.scr-pad{padding:0 14px;}
+.top-bar{display:flex;align-items:flex-end;justify-content:space-between;padding:0 14px 12px;border-bottom:1px solid #1e1e28;margin-bottom:14px;}
+.top-bar h1{font-weight:900;font-size:26px;letter-spacing:-1px;line-height:1;color:#fff;text-transform:uppercase;}
+.top-date{font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;color:#4a4a5a;margin-top:3px;letter-spacing:1px;}
+.top-badge{font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;color:#e8ff47;background:rgba(232,255,71,.08);border:1px solid rgba(232,255,71,.2);padding:4px 10px;letter-spacing:1px;}
+.live-stats{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+.ls-card{background:#111116;border:1px solid #1e1e28;padding:8px 10px;text-align:center;position:relative;overflow:hidden;flex-shrink:0;min-width:76px;}
+.ls-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--ex-color,#e8ff47);}
+.ls-val{font-family:'Share Tech Mono','Courier New',monospace;font-size:19px;font-weight:700;color:#fff;line-height:1;}
+.ls-label{font-family:'Share Tech Mono','Courier New',monospace;font-size:7px;color:#4a4a5a;letter-spacing:1px;margin-top:3px;text-transform:uppercase;}
+.panel{background:#111116;border:1px solid #1e1e28;padding:16px;margin-bottom:12px;position:relative;}
+.panel::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:#e8ff47;}
+.panel.purple::before{background:#b47fff;}
+.panel-title{font-weight:700;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#e8ff47;margin-bottom:14px;}
+.panel.purple .panel-title{color:#b47fff;}
+.ex-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;margin-bottom:12px;}
+.ex-name{font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:1px;color:#fff;}
+.ex-sub{font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;color:#4a4a5a;margin-top:2px;}
+.ctrl{display:flex;align-items:center;gap:4px;}
+.qty-btn{width:36px;height:36px;background:transparent;border:1px solid #1e1e28;color:#c8c8d8;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono','Courier New',monospace;}
+.qty-btn:active{background:rgba(232,255,71,.1);border-color:#e8ff47;color:#e8ff47;}
+.qty-val{font-family:'Share Tech Mono','Courier New',monospace;font-size:18px;color:#fff;min-width:36px;text-align:center;font-weight:700;}
+.unit{font-family:'Share Tech Mono','Courier New',monospace;font-size:8px;color:#4a4a5a;letter-spacing:1px;}
+.timer-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 14px;}
+.timer-ring{position:relative;width:150px;height:150px;}
+.timer-ring svg{transform:rotate(-90deg);position:absolute;top:0;left:0;}
+.ring-bg{fill:none;stroke:#1e1e28;stroke-width:4;}
+.ring-fg{fill:none;stroke:#b47fff;stroke-width:4;stroke-linecap:butt;stroke-dasharray:423;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;}
+.ring-fg.urgent{stroke:#ff4f6d;}
+.timer-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.timer-time{font-family:'Share Tech Mono','Courier New',monospace;font-size:30px;color:#fff;letter-spacing:2px;line-height:1;}
+.timer-meta{margin-top:8px;font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;color:#4a4a5a;letter-spacing:1px;}
+.btn{display:block;width:100%;padding:13px;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border:none;}
+.btn-primary{background:#e8ff47;color:#0a0a0c;}
+.btn-primary:active{background:#d4e840;}
+.btn-secondary{background:transparent;color:#c8c8d8;border:1px solid #1e1e28;}
+.btn-secondary:active{border-color:#e8ff47;color:#e8ff47;}
+.btn-teal{background:#47d4ff;color:#0a0a0c;}
+.btn-danger{background:transparent;color:#ff4f6d;border:1px solid rgba(255,79,109,.3);font-size:11px;padding:11px;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.divider{height:1px;background:#1e1e28;margin:8px 0 12px;}
+.hist-panel{background:#111116;border:1px solid #1e1e28;padding:14px;margin-bottom:12px;}
+.hist-title{font-weight:700;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#4a4a5a;margin-bottom:10px;}
+.hist-empty{font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;color:#4a4a5a;text-align:center;padding:10px 0;}
+.set-entry{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.set-entry:last-child{border-bottom:none;}
+.set-num{font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;color:#4a4a5a;width:24px;text-align:center;padding:2px;background:rgba(255,255,255,.03);border:1px solid #1e1e28;margin-top:1px;}
+.set-chips{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+.chip{font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;padding:2px 6px;border:1px solid rgba(232,255,71,.25);color:#e8ff47;background:rgba(232,255,71,.04);}
+.set-time{font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;color:#4a4a5a;margin-left:auto;padding-left:6px;flex-shrink:0;}
+.day-card{background:#111116;border:1px solid #1e1e28;padding:14px;margin-bottom:10px;position:relative;cursor:pointer;}
+.day-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:#b47fff;}
+.day-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+.day-date{font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#fff;}
+.day-sets{font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;color:#b47fff;letter-spacing:1px;}
+.day-ex-grid{display:flex;gap:8px;flex-wrap:wrap;}
+.day-ex-stat{text-align:center;background:rgba(255,255,255,.02);border:1px solid #1e1e28;padding:6px 10px;}
+.day-ex-val{font-family:'Share Tech Mono','Courier New',monospace;font-size:16px;color:#e8ff47;font-weight:700;}
+.day-ex-lbl{font-family:'Share Tech Mono','Courier New',monospace;font-size:7px;color:#4a4a5a;letter-spacing:1px;margin-top:2px;}
+.ex-sel-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.ex-sel-btn{padding:6px 10px;background:#111116;border:1px solid #1e1e28;color:#4a4a5a;font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;}
+.ex-sel-btn.sel{border-color:#e8ff47;color:#e8ff47;}
+.week-chart{background:#111116;border:1px solid #1e1e28;padding:14px;margin-bottom:10px;}
+.week-bars{display:flex;align-items:flex-end;gap:4px;height:60px;margin-top:10px;}
+.week-col{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;cursor:pointer;}
+.week-val{font-family:'Share Tech Mono','Courier New',monospace;font-size:7px;color:#4a4a5a;height:11px;}
+.week-bar{width:100%;border-radius:2px 2px 0 0;min-height:2px;}
+.week-lbl{font-family:'Share Tech Mono','Courier New',monospace;font-size:7px;color:#4a4a5a;}
+.big-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;}
+.big-stat{background:#111116;border:1px solid #1e1e28;padding:12px;text-align:center;}
+.big-stat-val{font-family:'Share Tech Mono','Courier New',monospace;font-size:26px;color:#fff;font-weight:700;line-height:1;}
+.big-stat-lbl{font-family:'Share Tech Mono','Courier New',monospace;font-size:8px;color:#4a4a5a;letter-spacing:1px;margin-top:4px;text-transform:uppercase;}
+.streak-bar{background:#111116;border:1px solid #1e1e28;padding:14px;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+.stat-section-title{font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;letter-spacing:3px;color:#4a4a5a;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #1e1e28;}
+.sum-grid{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.sum-stat{background:rgba(255,255,255,.02);border:1px solid #1e1e28;padding:8px 10px;text-align:center;flex:1;min-width:80px;}
+.sum-val{font-family:'Share Tech Mono','Courier New',monospace;font-size:20px;color:#e8ff47;font-weight:700;line-height:1;}
+.sum-lbl{font-family:'Share Tech Mono','Courier New',monospace;font-size:7px;color:#4a4a5a;letter-spacing:1px;margin-top:3px;text-transform:uppercase;}
+/* SETTINGS */
+.settings-ex-card{background:#111116;border:1px solid #1e1e28;padding:14px;margin-bottom:10px;position:relative;}
+.settings-ex-card.inactive{opacity:.5;}
+.settings-ex-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:#e8ff47;}
+.settings-ex-card.inactive::before{background:#4a4a5a;}
+.sett-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.sett-name{font-weight:700;font-size:15px;color:#fff;text-transform:uppercase;letter-spacing:1px;}
+.sett-type{font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;color:#4a4a5a;letter-spacing:1px;}
+.sett-btns{display:flex;gap:6px;}
+.sett-btn{padding:5px 10px;background:transparent;border:1px solid #1e1e28;color:#4a4a5a;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;}
+.sett-btn.on{border-color:#e8ff47;color:#e8ff47;}
+.sett-btn.del{border-color:rgba(255,79,109,.3);color:#ff4f6d;}
+.add-ex-form{background:#111116;border:1px solid #e8ff47;padding:16px;margin-bottom:12px;}
+.form-row{margin-bottom:12px;}
+.form-label{font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;color:#4a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.form-input{width:100%;background:#0a0a0c;border:1px solid #1e1e28;color:#fff;padding:10px;font-family:'Share Tech Mono','Courier New',monospace;font-size:14px;}
+.form-input:focus{outline:none;border-color:#e8ff47;}
+.type-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.type-btn{padding:10px;background:transparent;border:1px solid #1e1e28;color:#4a4a5a;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;cursor:pointer;text-transform:uppercase;}
+.type-btn.sel{border-color:#e8ff47;color:#e8ff47;background:rgba(232,255,71,.06);}
+.range-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.timer-preset-btn{flex:1;min-width:50px;padding:7px 4px;background:#111116;border:1px solid #1e1e28;color:#4a4a5a;font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;}
+.timer-preset-btn.active{border-color:#b47fff;color:#b47fff;background:rgba(180,127,255,.08);}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+.toast{position:fixed;top:0;left:0;right:0;background:#e8ff47;color:#0a0a0c;text-align:center;padding:13px;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;z-index:999;transform:translateY(-100%);transition:transform .4s cubic-bezier(.16,1,.3,1);}
+.toast.show{transform:translateY(0);}
+.toast.urgent{background:#ff4f6d;color:#fff;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.fadein{animation:fadeIn .25s ease forwards;}
 </style>
 </head>
 <body>
-
 <div class="toast" id="toast"></div>
-
 <div class="tab-bar">
   <button class="tab-btn active" id="tabToday" onclick="switchTab('today')"><span class="icon">&#x26A1;</span>HEUTE</button>
   <button class="tab-btn" id="tabHistory" onclick="switchTab('history')"><span class="icon">&#x1F4C5;</span>VERLAUF</button>
   <button class="tab-btn" id="tabStats" onclick="switchTab('stats')"><span class="icon">&#x1F4CA;</span>STATS</button>
+  <button class="tab-btn" id="tabSettings" onclick="switchTab('settings')"><span class="icon">&#x2699;</span>SETUP</button>
 </div>
-
 <!-- TODAY -->
-
 <div class="screen active" id="screenToday">
   <div class="top-bar">
-    <div>
-      <h1>HOURLY<br><span style="color:#e8ff47;">SETS</span></h1>
-      <div class="top-date" id="dateDisplay"></div>
-    </div>
+    <div><h1>HOURLY<br><span style="color:#e8ff47;">SETS</span></h1><div class="top-date" id="dateDisplay"></div></div>
     <div class="top-badge" id="setsBadge">0 SETS</div>
   </div>
   <div class="scr-pad">
-    <div class="live-stats">
-      <div class="ls-card"><div class="ls-val" id="liveSq">0</div><div class="ls-label">Squats</div></div>
-      <div class="ls-card gm"><div class="ls-val" id="liveGm">0</div><div class="ls-label">Good M.</div></div>
-      <div class="ls-card pl"><div class="ls-val" id="livePl">0s</div><div class="ls-label">Plank</div></div>
-    </div>
+    <div class="live-stats" id="liveStats"></div>
     <div class="panel" id="panelStart">
       <div class="panel-title">// Bereit?</div>
-      <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:11px;color:#4a4a5a;line-height:1.8;margin-bottom:16px;">Starte dein erstes Set wenn du bereit bist.<br>Der 1h-Timer laeuft danach automatisch.</div>
+      <div style="font-family:'Share Tech Mono','Courier New',monospace;font-size:11px;color:#4a4a5a;line-height:1.8;margin-bottom:16px;">Starte dein erstes Set wenn du bereit bist.<br>Der 1h-Timer laeuft danach automatisch.</div>
       <button class="btn btn-primary" onclick="startInputPhase()">&#x25B6; SET STARTEN</button>
     </div>
     <div class="panel" id="panelInput" style="display:none;">
       <div class="panel-title">// Werte eintragen</div>
-      <div class="ex-row">
-        <div><div class="ex-name">Squats</div><div class="ex-sub">10-20 WDH</div></div>
-        <div class="ctrl">
-          <button class="qty-btn" onclick="change('sq',-1)">-</button>
-          <div class="qty-val" id="sqVal">15</div>
-          <button class="qty-btn" onclick="change('sq',1)">+</button>
-          <div class="unit">WDH</div>
-        </div>
-      </div>
-      <div class="ex-row">
-        <div><div class="ex-name">Good Mornings</div><div class="ex-sub">10-20 WDH / RDL</div></div>
-        <div class="ctrl">
-          <button class="qty-btn" onclick="change('gm',-1)">-</button>
-          <div class="qty-val" id="gmVal">15</div>
-          <button class="qty-btn" onclick="change('gm',1)">+</button>
-          <div class="unit">WDH</div>
-        </div>
-      </div>
-      <div class="ex-row">
-        <div><div class="ex-name">Plank</div><div class="ex-sub">30-60 SEK</div></div>
-        <div class="ctrl">
-          <button class="qty-btn" onclick="change('pl',-5)">-</button>
-          <div class="qty-val" id="plVal">45</div>
-          <button class="qty-btn" onclick="change('pl',5)">+</button>
-          <div class="unit">SEK</div>
-        </div>
-      </div>
+      <div id="inputRows"></div>
       <div class="divider"></div>
       <button class="btn btn-primary" onclick="logSet()">&#x2713; SET SPEICHERN</button>
     </div>
-    <div class="panel timer-accent" id="panelTimer" style="display:none;">
+    <div class="panel purple" id="panelTimer" style="display:none;">
       <div class="panel-title">// Naechstes Set in...</div>
       <div class="timer-wrap">
         <div class="timer-ring">
-          <svg width="160" height="160" viewBox="0 0 160 160">
-            <circle class="ring-bg" cx="80" cy="80" r="72"/>
-            <circle class="ring-fg" id="ringFg" cx="80" cy="80" r="72"/>
+          <svg width="150" height="150" viewBox="0 0 150 150">
+            <circle class="ring-bg" cx="75" cy="75" r="67"/>
+            <circle class="ring-fg" id="ringFg" cx="75" cy="75" r="67"/>
           </svg>
-          <div class="timer-center">
-            <div class="timer-time" id="timerDisplay">60:00</div>
-          </div>
+          <div class="timer-center"><div class="timer-time" id="timerDisplay">60:00</div></div>
         </div>
         <div class="timer-meta" id="timerMeta">-</div>
       </div>
       <div style="margin-bottom:10px;">
-        <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:9px;color:#4a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">// NAECHSTEN TIMER ANPASSEN</div>
+        <div style="font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;color:#4a4a5a;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">// NAECHSTER TIMER</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;" id="timerPresets">
           <button class="timer-preset-btn active" onclick="setNextDuration(30)">30 Min</button>
           <button class="timer-preset-btn" onclick="setNextDuration(45)">45 Min</button>
@@ -208,572 +180,837 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
           <button class="timer-preset-btn" onclick="setNextDuration(120)">2 Std</button>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:9px;color:#4a4a5a;white-space:nowrap;">Eigene:</div>
-          <input type="number" id="customMinutes" min="5" max="240" placeholder="Min" style="flex:1;background:#0a0a0c;border:1px solid #1e1e28;color:#fff;padding:7px 10px;font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:14px;width:100%;" oninput="setCustomDuration(this.value)">
-          <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:9px;color:#4a4a5a;">MIN</div>
+          <input type="number" id="customMinutes" min="5" max="480" placeholder="Eigene Min" style="flex:1;background:#0a0a0c;border:1px solid #1e1e28;color:#fff;padding:8px 10px;font-family:'Share Tech Mono','Courier New',monospace;font-size:13px;" oninput="setCustomDuration(this.value)">
+          <div style="font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;color:#4a4a5a;">MIN</div>
         </div>
-
-```
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-teal" onclick="startInputPhase()">+ JETZT SET</button>
-    <button class="btn btn-danger" onclick="confirmEnd()">&#x23F9; FERTIG</button>
-  </div>
-</div>
-<div class="panel" id="panelSummary" style="display:none;">
-  <div class="panel-title">// Tages-Summary</div>
-  <div class="sum-grid">
-    <div class="sum-stat"><div class="sum-val" id="sumSets">0</div><div class="sum-lbl">Sets</div></div>
-    <div class="sum-stat"><div class="sum-val" style="color:#e8ff47;" id="sumSq">0</div><div class="sum-lbl">Squats</div></div>
-    <div class="sum-stat"><div class="sum-val" style="color:#47d4ff;" id="sumGm">0</div><div class="sum-lbl">Good M.</div></div>
-  </div>
-  <div class="sum-grid">
-    <div class="sum-stat" style="grid-column:1/3;"><div class="sum-val" style="color:#ff4f6d;" id="sumPl">0</div><div class="sum-lbl">Plank-Sekunden</div></div>
-    <div class="sum-stat"><div class="sum-val" style="font-size:13px;" id="sumSpan">-</div><div class="sum-lbl">Zeitraum</div></div>
-  </div>
-  <button class="btn btn-primary" onclick="resetDay()">&#x21BA; NEUER TAG</button>
-</div>
-<div class="hist-panel">
-  <div class="hist-title">// LOG HEUTE</div>
-  <div id="historyList"><div class="hist-empty">Noch keine Sets - los geht's!</div></div>
-</div>
-```
-
-  </div>
-</div>
-
-<!-- HISTORY -->
-
-<div class="screen" id="screenHistory">
-  <div class="top-bar">
-    <div><h1>VER<span style="color:#e8ff47;">LAUF</span></h1><div class="top-date">LETZTE 30 TAGE</div></div>
-  </div>
-  <div class="scr-pad">
-    <div style="display:flex;gap:6px;margin-bottom:10px;">
-      <button class="ex-sel-btn sq-active" id="selSq" onclick="selectEx('sq')">SQUATS</button>
-      <button class="ex-sel-btn" id="selGm" onclick="selectEx('gm')">GOOD M.</button>
-      <button class="ex-sel-btn" id="selPl" onclick="selectEx('pl')">PLANK</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-teal" onclick="startInputPhase()">+ JETZT SET</button>
+        <button class="btn btn-danger" onclick="confirmEnd()">&#x23F9; FERTIG</button>
+      </div>
     </div>
+    <div class="panel" id="panelSummary" style="display:none;">
+      <div class="panel-title">// Tages-Summary &#x1F3C1;</div>
+      <div class="sum-grid" id="sumGrid"></div>
+      <button class="btn btn-primary" onclick="resetDay()">&#x21BA; NEUER TAG</button>
+    </div>
+    <div class="hist-panel">
+      <div class="hist-title">// LOG HEUTE</div>
+      <div id="historyList"><div class="hist-empty">Noch keine Sets - los geht's!</div></div>
+    </div>
+  </div>
+</div>
+<!-- HISTORY -->
+<div class="screen" id="screenHistory">
+  <div class="top-bar"><div><h1>VER<span style="color:#e8ff47;">LAUF</span></h1><div class="top-date">LETZTE 30 TAGE</div></div></div>
+  <div class="scr-pad">
+    <div class="ex-sel-btns" id="chartExBtns"></div>
     <div class="week-chart">
-      <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:2px;color:#4a4a5a;text-transform:uppercase;" id="chartTitle">7-Tage Squats</div>
+      <div style="font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;letter-spacing:2px;color:#4a4a5a;text-transform:uppercase;" id="chartTitle">7-Tage</div>
       <div class="week-bars" id="weekBars"></div>
     </div>
     <div id="selectedDay" style="display:none;margin-bottom:10px;"></div>
     <div id="historyDays"><div class="hist-empty" style="padding:20px 0;">Noch keine Verlaufsdaten.</div></div>
   </div>
 </div>
-
 <!-- STATS -->
-
 <div class="screen" id="screenStats">
-  <div class="top-bar">
-    <div><h1>MY<span style="color:#e8ff47;">STATS</span></h1><div class="top-date">GESAMT</div></div>
-  </div>
+  <div class="top-bar"><div><h1>MY<span style="color:#e8ff47;">STATS</span></h1><div class="top-date">GESAMT</div></div></div>
   <div class="scr-pad">
     <div class="streak-bar">
-      <div style="font-size:32px;">&#x1F525;</div>
+      <div style="font-size:30px;">&#x1F525;</div>
       <div style="flex:1;">
-        <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:28px;color:#e8ff47;font-weight:700;line-height:1;" id="streakNum">0</div>
-        <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:9px;color:#4a4a5a;letter-spacing:1px;">TAGE IN FOLGE</div>
+        <div style="font-family:'Share Tech Mono','Courier New',monospace;font-size:26px;color:#e8ff47;font-weight:700;line-height:1;" id="streakNum">0</div>
+        <div style="font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;color:#4a4a5a;letter-spacing:1px;">TAGE IN FOLGE</div>
       </div>
       <div style="text-align:right;">
-        <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:18px;color:#4a4a5a;" id="bestStreak">0</div>
-        <div style="font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:8px;color:#4a4a5a;letter-spacing:1px;">BEST</div>
+        <div style="font-family:'Share Tech Mono','Courier New',monospace;font-size:18px;color:#4a4a5a;" id="bestStreak">0</div>
+        <div style="font-family:'Share Tech Mono','Courier New',monospace;font-size:8px;color:#4a4a5a;letter-spacing:1px;">BEST</div>
       </div>
     </div>
     <div class="stat-section-title">// GESAMTVOLUMEN</div>
-    <div class="big-stat-grid">
-      <div class="big-stat"><div class="big-stat-val" style="color:#e8ff47;" id="allSq">0</div><div class="big-stat-lbl">Squats gesamt</div></div>
-      <div class="big-stat"><div class="big-stat-val" style="color:#47d4ff;" id="allGm">0</div><div class="big-stat-lbl">Good Mornings</div></div>
-      <div class="big-stat"><div class="big-stat-val" style="color:#ff4f6d;" id="allPl">0</div><div class="big-stat-lbl">Plank-Sek.</div></div>
-      <div class="big-stat"><div class="big-stat-val" style="color:#b47fff;" id="allSets">0</div><div class="big-stat-lbl">Sets gesamt</div></div>
-    </div>
-    <div class="stat-section-title">// TAGES-DURCHSCHNITT</div>
+    <div id="allTimeStats" class="big-stat-grid"></div>
+    <div class="stat-section-title">// DURCHSCHNITT</div>
     <div class="big-stat-grid">
       <div class="big-stat"><div class="big-stat-val" id="avgSets">0</div><div class="big-stat-lbl">Avg Sets/Tag</div></div>
-      <div class="big-stat"><div class="big-stat-val" id="avgSq">0</div><div class="big-stat-lbl">Avg Squats/Tag</div></div>
+      <div class="big-stat"><div class="big-stat-val" id="totalDays">0</div><div class="big-stat-lbl">Aktive Tage</div></div>
     </div>
-    <div class="stat-section-title">// BESTLEISTUNGEN</div>
-    <div class="big-stat-grid">
-      <div class="big-stat"><div class="big-stat-val" style="color:#e8ff47;" id="bestSets">0</div><div class="big-stat-lbl">Max Sets/Tag</div></div>
-      <div class="big-stat"><div class="big-stat-val" style="color:#47d4ff;" id="bestSqDay">0</div><div class="big-stat-lbl">Max Squats/Tag</div></div>
-    </div>
-    <div style="height:10px;"></div>
     <div class="stat-section-title">// BACKUP</div>
-    <button class="btn btn-secondary" onclick="exportData()" style="margin-bottom:8px;">&#x2B07; DATEN EXPORTIEREN</button>
-    <button class="btn btn-secondary" onclick="document.getElementById('importInput').click()" style="margin-bottom:14px;">&#x2B06; DATEN IMPORTIEREN</button>
+    <button class="btn btn-secondary" onclick="exportData()" style="margin-bottom:8px;">&#x2B07; EXPORTIEREN</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('importInput').click()" style="margin-bottom:14px;">&#x2B06; IMPORTIEREN</button>
     <input type="file" id="importInput" accept=".json" style="display:none;" onchange="importData(this)">
     <button class="btn btn-danger" onclick="confirmClearAll()">&#x26A0; ALLE DATEN LOESCHEN</button>
     <div style="height:16px;"></div>
   </div>
 </div>
+<!-- SETTINGS -->
+<div class="screen" id="screenSettings">
+  <div class="top-bar"><div><h1>SE<span style="color:#e8ff47;">TUP</span></h1><div class="top-date">UEBUNGEN KONFIGURIEREN</div></div></div>
+  <div class="scr-pad">
+    <div id="exerciseCards"></div>
+    <button class="btn btn-secondary" onclick="toggleAddForm()" style="margin-bottom:12px;">+ NEUE UEBUNG</button>
+    <div class="add-ex-form" id="editExForm" style="display:none;border-color:#b47fff;margin-bottom:12px;">
+      <div class="panel-title" style="margin-bottom:14px;color:#b47fff;">// UEBUNG BEARBEITEN</div>
+      <input type="hidden" id="editExId">
+      <input type="hidden" id="editExType" value="reps">
+      <div class="form-row">
+        <div class="form-label">Name</div>
+        <input type="text" id="editExName" class="form-input" maxlength="24">
+      </div>
+      <div class="form-row">
+        <div class="form-label">Typ</div>
+        <div class="type-btns">
+          <button class="type-btn sel" id="editTypeReps" onclick="selectEditType('reps')">Wiederholungen</button>
+          <button class="type-btn" id="editTypeSecs" onclick="selectEditType('secs')">Sekunden</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Bereich (Min / Max)</div>
+        <div class="range-row">
+          <input type="number" id="editExMin" class="form-input" min="1" max="999">
+          <input type="number" id="editExMax" class="form-input" min="1" max="999">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Schritt</div>
+        <input type="number" id="editExStep" class="form-input" min="1" max="60">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveEditExercise()">SPEICHERN</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('editExForm').style.display='none'">ABBRECHEN</button>
+      </div>
+    </div>
 
+```
+<div class="add-ex-form" id="addExForm" style="display:none;">
+  <div class="panel-title" style="margin-bottom:14px;">// NEUE UEBUNG</div>
+  <div class="form-row">
+    <div class="form-label">Name</div>
+    <input type="text" id="newExName" class="form-input" placeholder="z.B. Liegestuetze" maxlength="24">
+  </div>
+  <div class="form-row">
+    <div class="form-label">Typ</div>
+    <div class="type-btns">
+      <button class="type-btn sel" id="typeReps" onclick="selectType('reps')">Wiederholungen</button>
+      <button class="type-btn" id="typeSecs" onclick="selectType('secs')">Sekunden</button>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-label">Bereich (Min / Max)</div>
+    <div class="range-row">
+      <input type="number" id="newExMin" class="form-input" placeholder="Min" min="1" max="999">
+      <input type="number" id="newExMax" class="form-input" placeholder="Max" min="1" max="999">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-label">Schritt</div>
+    <input type="number" id="newExStep" class="form-input" placeholder="z.B. 1 oder 5" min="1" max="60">
+  </div>
+  <button class="btn btn-primary" onclick="addExercise()">HINZUFUEGEN</button>
+</div>
+```
+
+  </div>
+</div>
 <script>
-var TIMER_SEC = 3600;
+// ── DEFAULT EXERCISES (legacy compatible) ─────────────────────────────────
+var DEFAULT_EXERCISES = [
+  { id:'sq', name:'Squats',        type:'reps', min:10, max:20, step:1,  active:true,  color:'#e8ff47' },
+  { id:'gm', name:'Good Mornings', type:'reps', min:10, max:20, step:1,  active:true,  color:'#47d4ff' },
+  { id:'pl', name:'Plank',         type:'secs', min:30, max:60, step:5,  active:true,  color:'#ff4f6d' }
+];
+var EX_COLORS = ['#e8ff47','#47d4ff','#ff4f6d','#b47fff','#ff9f47','#47ffb4','#ff47b4','#47b4ff'];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+var exercises = [];
+var currentVals = {};
+var sets = [];
+var phase = ‘start’;
+var timerInterval = null;
+var timerRemaining = 3600;
 var nextTimerSec = 3600;
 var currentTimerTotal = 3600;
-var CIRC = 452;
-var S = { sq:15, gm:15, pl:45, sets:[], phase:'start', timerInterval:null, timerRemaining:3600, nextSetTime:null };
-var chartEx = 'sq';
+var nextSetTime = null;
 var histDays = [];
+var chartExId = ‘’;
+var newExType = ‘reps’;
 
-function todayKey() { return 'hs_' + new Date().toISOString().slice(0,10); }
-
+// ── STORAGE ───────────────────────────────────────────────────────────────
+function todayKey() { return ‘hs_’ + new Date().toISOString().slice(0,10); }
 function getAllDayKeys() {
-  var keys = [];
-  for (var i = 0; i < localStorage.length; i++) {
-    var k = localStorage.key(i);
-    if (k && k.indexOf('hs_20') === 0) keys.push(k);
-  }
-  keys.sort();
-  keys.reverse();
-  return keys;
+var keys = [];
+for (var i=0; i<localStorage.length; i++) {
+var k = localStorage.key(i);
+if (k && k.indexOf(‘hs_20’) === 0) keys.push(k);
 }
-
+keys.sort(); keys.reverse(); return keys;
+}
+function loadExercises() {
+try {
+var raw = localStorage.getItem(‘hs_exercises’);
+if (raw) { exercises = JSON.parse(raw); return; }
+} catch(e) {}
+exercises = JSON.parse(JSON.stringify(DEFAULT_EXERCISES));
+saveExercises();
+}
+function saveExercises() {
+try { localStorage.setItem(‘hs_exercises’, JSON.stringify(exercises)); } catch(e) {}
+}
 function saveToday() {
-  try { localStorage.setItem(todayKey(), JSON.stringify({ sq:S.sq, gm:S.gm, pl:S.pl, sets:S.sets, phase:S.phase, nextSetTime:S.nextSetTime })); } catch(e) {}
+try { localStorage.setItem(todayKey(), JSON.stringify({ sets:sets, phase:phase, nextSetTime:nextSetTime })); } catch(e) {}
 }
-
 function loadToday() {
-  try {
-    var raw = localStorage.getItem(todayKey());
-    if (!raw) return;
-    var d = JSON.parse(raw);
-    S.sets = d.sets || []; S.sq = d.sq||15; S.gm = d.gm||15; S.pl = d.pl||45;
-    document.getElementById('sqVal').textContent = S.sq;
-    document.getElementById('gmVal').textContent = S.gm;
-    document.getElementById('plVal').textContent = S.pl;
-    updateLiveStats(); renderTodayLog(); updateBadge();
-    if (d.phase === 'done') { showSummaryPanel(); return; }
-    if (d.phase === 'timer' && d.nextSetTime) {
-      var rem = Math.round((new Date(d.nextSetTime) - Date.now()) / 1000);
-      if (rem > 0) { S.nextSetTime = new Date(d.nextSetTime); showPhase('timer'); startTimer(rem); return; }
-      else { showPhase('input'); showToast('Bereit fuers naechste Set!', true); return; }
-    }
-    if (S.sets.length > 0 && d.phase === 'input') showPhase('input');
-  } catch(e) {}
+try {
+var raw = localStorage.getItem(todayKey());
+if (!raw) return;
+var d = JSON.parse(raw);
+sets = d.sets || [];
+updateLiveStats(); renderTodayLog(); updateBadge();
+if (d.phase === ‘done’) { showSummaryPanel(); return; }
+if (d.phase === ‘timer’ && d.nextSetTime) {
+var rem = Math.round((new Date(d.nextSetTime) - Date.now()) / 1000);
+if (rem > 0) { nextSetTime = new Date(d.nextSetTime); showPhase(‘timer’); startTimer(rem); return; }
+else { showPhase(‘input’); showToast(‘Bereit fuers naechste Set!’, true); return; }
+}
+if (sets.length > 0 && d.phase === ‘input’) showPhase(‘input’);
+} catch(e) {}
 }
 
+// ── TABS ──────────────────────────────────────────────────────────────────
 function switchTab(tab) {
-  var tabs = ['today','history','stats'];
-  for (var i=0; i<tabs.length; i++) {
-    document.getElementById('screen' + tabs[i].charAt(0).toUpperCase() + tabs[i].slice(1)).classList.remove('active');
-    document.getElementById('tab' + tabs[i].charAt(0).toUpperCase() + tabs[i].slice(1)).classList.remove('active');
-  }
-  document.getElementById('screen' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-  if (tab === 'history') renderHistory();
-  if (tab === 'stats') renderStats();
+var tabs = [‘today’,‘history’,‘stats’,‘settings’];
+for (var i=0; i<tabs.length; i++) {
+var n = tabs[i]; var cap = n.charAt(0).toUpperCase()+n.slice(1);
+document.getElementById(‘screen’+cap).classList.remove(‘active’);
+document.getElementById(‘tab’+cap).classList.remove(‘active’);
+}
+var c = tab.charAt(0).toUpperCase()+tab.slice(1);
+document.getElementById(‘screen’+c).classList.add(‘active’);
+document.getElementById(‘tab’+c).classList.add(‘active’);
+if (tab === ‘history’) renderHistory();
+if (tab === ‘stats’) renderStats();
+if (tab === ‘settings’) renderSettings();
 }
 
+// ── PHASE ─────────────────────────────────────────────────────────────────
 function showPhase(name) {
-  var panels = ['panelStart','panelInput','panelTimer','panelSummary'];
-  for (var i=0; i<panels.length; i++) document.getElementById(panels[i]).style.display = 'none';
-  S.phase = name;
-  var map = { start:'panelStart', input:'panelInput', timer:'panelTimer', done:'panelSummary' };
-  if (map[name]) document.getElementById(map[name]).style.display = 'block';
-  saveToday();
+var ps = [‘panelStart’,‘panelInput’,‘panelTimer’,‘panelSummary’];
+for (var i=0; i<ps.length; i++) document.getElementById(ps[i]).style.display = ‘none’;
+phase = name;
+var map = { start:‘panelStart’, input:‘panelInput’, timer:‘panelTimer’, done:‘panelSummary’ };
+if (map[name]) document.getElementById(map[name]).style.display = ‘block’;
+saveToday();
+}
+function startInputPhase() { stopTimer(); renderInputRows(); showPhase(‘input’); }
+
+// ── EXERCISES ─────────────────────────────────────────────────────────────
+function activeExercises() {
+var out = [];
+for (var i=0; i<exercises.length; i++) { if (exercises[i].active) out.push(exercises[i]); }
+return out;
+}
+function exById(id) {
+for (var i=0; i<exercises.length; i++) { if (exercises[i].id === id) return exercises[i]; }
+return null;
 }
 
-function change(ex, d) {
-  var lim = { sq:[10,20], gm:[10,20], pl:[30,60] };
-  var step = { sq:1, gm:1, pl:5 };
-  S[ex] = Math.min(lim[ex][1], Math.max(lim[ex][0], S[ex] + d * step[ex]));
-  document.getElementById(ex + 'Val').textContent = S[ex];
+// ── INPUT ROWS ────────────────────────────────────────────────────────────
+function renderInputRows() {
+var active = activeExercises();
+// init currentVals with defaults
+for (var i=0; i<active.length; i++) {
+var ex = active[i];
+if (!currentVals[ex.id]) currentVals[ex.id] = Math.round((ex.min + ex.max) / 2 / ex.step) * ex.step;
+}
+var html = ‘’;
+for (var i=0; i<active.length; i++) {
+var ex = active[i];
+var val = currentVals[ex.id] || ex.min;
+var unitLabel = ex.type === ‘secs’ ? ‘SEK’ : ‘WDH’;
+var rangeLabel = ex.min + ‘-’ + ex.max + ’ ’ + unitLabel;
+html += ‘<div class="ex-row">’;
+html += ‘<div><div class="ex-name">’ + ex.name + ‘</div><div class="ex-sub">’ + rangeLabel + ‘</div></div>’;
+html += ‘<div class="ctrl">’;
+html += ‘<button class="qty-btn" onclick="changeVal(\'' + ex.id + '\',-1)">-</button>’;
+html += ‘<div class="qty-val" id="val_' + ex.id + '">’ + val + ‘</div>’;
+html += ‘<button class="qty-btn" onclick="changeVal(\'' + ex.id + '\',1)">+</button>’;
+html += ‘<div class="unit">’ + unitLabel + ‘</div>’;
+html += ‘</div></div>’;
+}
+document.getElementById(‘inputRows’).innerHTML = html;
 }
 
-function startInputPhase() { stopTimer(); showPhase('input'); }
+function changeVal(id, dir) {
+var ex = exById(id);
+if (!ex) return;
+var cur = currentVals[id] || ex.min;
+cur = Math.min(ex.max, Math.max(ex.min, cur + dir * ex.step));
+currentVals[id] = cur;
+var el = document.getElementById(‘val_’ + id);
+if (el) el.textContent = cur;
+}
 
+// ── LOG SET ───────────────────────────────────────────────────────────────
 function logSet() {
-  var now = new Date();
-  S.sets.push({ n: S.sets.length+1, sq:S.sq, gm:S.gm, pl:S.pl, time: now.toTimeString().slice(0,5) });
-  updateLiveStats(); renderTodayLog(); updateBadge();
-  S.nextSetTime = new Date(now.getTime() + nextTimerSec * 1000);
-  showPhase('timer'); startTimer(nextTimerSec, TIMER_SEC); saveToday();
-  showToast('Set #' + S.sets.length + ' gespeichert!');
+var now = new Date();
+var active = activeExercises();
+var vals = {};
+for (var i=0; i<active.length; i++) {
+vals[active[i].id] = currentVals[active[i].id] || active[i].min;
+}
+sets.push({ n: sets.length+1, vals: vals, time: now.toTimeString().slice(0,5) });
+updateLiveStats(); renderTodayLog(); updateBadge();
+nextSetTime = new Date(now.getTime() + nextTimerSec * 1000);
+showPhase(‘timer’); startTimer(nextTimerSec); saveToday();
+showToast(‘Set #’ + sets.length + ’ gespeichert!’);
 }
 
+// ── LIVE STATS ────────────────────────────────────────────────────────────
 function updateLiveStats() {
-  var sq=0, gm=0, pl=0;
-  for (var i=0; i<S.sets.length; i++) { sq+=S.sets[i].sq; gm+=S.sets[i].gm; pl+=S.sets[i].pl; }
-  document.getElementById('liveSq').textContent = sq;
-  document.getElementById('liveGm').textContent = gm;
-  document.getElementById('livePl').textContent = pl + 's';
+var active = activeExercises();
+var totals = {};
+for (var i=0; i<active.length; i++) totals[active[i].id] = 0;
+for (var i=0; i<sets.length; i++) {
+var s = sets[i];
+for (var id in s.vals) { if (totals[id] !== undefined) totals[id] += s.vals[id]; }
+// legacy support
+if (s.sq !== undefined && totals[‘sq’] !== undefined) totals[‘sq’] += s.sq;
+if (s.gm !== undefined && totals[‘gm’] !== undefined) totals[‘gm’] += s.gm;
+if (s.pl !== undefined && totals[‘pl’] !== undefined) totals[‘pl’] += s.pl;
+}
+var html = ‘’;
+for (var i=0; i<active.length; i++) {
+var ex = active[i];
+var val = totals[ex.id] || 0;
+var disp = ex.type === ‘secs’ ? val+‘s’ : String(val);
+html += ‘<div class="ls-card" style="--ex-color:'+ex.color+'">’;
+html += ‘<div class="ls-val">’+disp+’</div>’;
+html += ‘<div class="ls-label">’+ex.name+’</div>’;
+html += ‘</div>’;
+}
+document.getElementById(‘liveStats’).innerHTML = html;
 }
 
-function startTimer(secs, totalSecs) {
-  if (!totalSecs) totalSecs = secs;
-  currentTimerTotal = totalSecs;
-  requestNotifPermission();
-  scheduleNotif(secs);
-  stopTimer();
-  S.timerRemaining = secs;
-  updateTimerUI(secs);
-  var nextStr = S.nextSetTime ? S.nextSetTime.toTimeString().slice(0,5) : '-';
-  document.getElementById('timerMeta').textContent = 'Naechstes Set: ' + nextStr + ' Uhr';
-  S.timerInterval = setInterval(function() {
-    S.timerRemaining--;
-    updateTimerUI(S.timerRemaining);
-    if (S.timerRemaining <= 300) document.getElementById('ringFg').classList.add('urgent');
-    if (S.timerRemaining <= 0) {
-      stopTimer(); showToast('Zeit fuers naechste Set!', true); showPhase('input');
-      if (navigator.vibrate) navigator.vibrate([300,100,300]);
-      saveToday();
-    }
-  }, 1000);
-}
-
-function stopTimer() {
-  if (S.timerInterval) { clearInterval(S.timerInterval); S.timerInterval = null; }
-  if (window._notifTimer) { clearTimeout(window._notifTimer); window._notifTimer = null; }
-  document.getElementById('ringFg').classList.remove('urgent');
-}
-
-function updateTimerUI(secs) {
-  secs = Math.max(0, secs);
-  var m = String(Math.floor(secs/60)).length < 2 ? '0'+Math.floor(secs/60) : String(Math.floor(secs/60));
-  var s = String(secs%60).length < 2 ? '0'+String(secs%60) : String(secs%60);
-  document.getElementById('timerDisplay').textContent = m + ':' + s;
-  document.getElementById('ringFg').style.strokeDashoffset = String(CIRC * (1 - secs/currentTimerTotal));
-}
-
+// ── TODAY LOG ─────────────────────────────────────────────────────────────
 function renderTodayLog() {
-  var el = document.getElementById('historyList');
-  if (!S.sets.length) { el.innerHTML = '<div class="hist-empty">Noch keine Sets - los geht\'s!</div>'; return; }
-  var html = '';
-  var rev = S.sets.slice().reverse();
-  for (var i=0; i<rev.length; i++) {
-    var s = rev[i];
-    html += '<div class="set-entry">';
-    html += '<div class="set-num">#' + s.n + '</div>';
-    html += '<div class="set-data">';
-    html += '<div class="chip sq">SQ ' + s.sq + '</div>';
-    html += '<div class="chip gm">GM ' + s.gm + '</div>';
-    html += '<div class="chip pl">' + s.pl + 's</div>';
-    html += '</div>';
-    html += '<div class="set-time">' + s.time + '</div>';
-    html += '</div>';
-  }
-  el.innerHTML = html;
+var el = document.getElementById(‘historyList’);
+if (!sets.length) { el.innerHTML = ‘<div class="hist-empty">Noch keine Sets - los geht's!</div>’; return; }
+var html = ‘’;
+var rev = sets.slice().reverse();
+for (var i=0; i<rev.length; i++) {
+var s = rev[i];
+html += ‘<div class="set-entry">’;
+html += ‘<div class="set-num">#’+s.n+’</div>’;
+html += ‘<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;flex:1;">’;
+html += ‘<div class="set-chips">’;
+// new format
+if (s.vals) {
+for (var id in s.vals) {
+var ex = exById(id);
+var name = ex ? ex.name.slice(0,4).toUpperCase() : id.toUpperCase();
+var col = ex ? ex.color : ‘#e8ff47’;
+var unit = ex && ex.type === ‘secs’ ? ‘s’ : ‘’;
+html += ‘<div class="chip" style="color:'+col+';border-color:'+col+'44;background:'+col+'0a;">’+name+’ ‘+s.vals[id]+unit+’</div>’;
+}
+} else {
+// legacy sq/gm/pl
+if (s.sq !== undefined) html += ‘<div class="chip" style="color:#e8ff47;border-color:#e8ff4744;background:#e8ff470a;">SQ ‘+s.sq+’</div>’;
+if (s.gm !== undefined) html += ‘<div class="chip" style="color:#47d4ff;border-color:#47d4ff44;background:#47d4ff0a;">GM ‘+s.gm+’</div>’;
+if (s.pl !== undefined) html += ‘<div class="chip" style="color:#ff4f6d;border-color:#ff4f6d44;background:#ff4f6d0a;">PL ‘+s.pl+‘s</div>’;
+}
+html += ‘</div>’;
+html += ‘<span class="set-time">’+s.time+’</span>’;
+html += ‘</div></div>’;
+}
+el.innerHTML = html;
 }
 
-function updateBadge() { document.getElementById('setsBadge').textContent = S.sets.length + ' SETS'; }
+function updateBadge() { document.getElementById(‘setsBadge’).textContent = sets.length + ’ SETS’; }
 
-function confirmEnd() { if (confirm('Tag abschliessen?')) endDay(); }
+// ── TIMER ─────────────────────────────────────────────────────────────────
+var CIRC = 421;
+function startTimer(secs) {
+stopTimer();
+currentTimerTotal = secs;
+timerRemaining = secs;
+updateTimerUI(secs);
+var nextStr = nextSetTime ? nextSetTime.toTimeString().slice(0,5) : ‘-’;
+document.getElementById(‘timerMeta’).textContent = ‘Naechstes Set: ’ + nextStr + ’ Uhr’;
+requestNotifPermission();
+scheduleNotif(secs);
+timerInterval = setInterval(function() {
+timerRemaining–;
+updateTimerUI(timerRemaining);
+if (timerRemaining <= 300) document.getElementById(‘ringFg’).classList.add(‘urgent’);
+if (timerRemaining <= 0) {
+stopTimer(); showToast(‘Zeit fuers naechste Set!’, true);
+renderInputRows(); showPhase(‘input’);
+if (navigator.vibrate) navigator.vibrate([300,100,300]);
+saveToday();
+}
+}, 1000);
+}
+function stopTimer() {
+if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+if (window._notifTimer) { clearTimeout(window._notifTimer); window._notifTimer = null; }
+document.getElementById(‘ringFg’).classList.remove(‘urgent’);
+}
+function updateTimerUI(secs) {
+secs = Math.max(0, secs);
+var m = Math.floor(secs/60); var s = secs%60;
+var ms = (m < 10 ? ‘0’ : ‘’) + m; var ss = (s < 10 ? ‘0’ : ‘’) + s;
+document.getElementById(‘timerDisplay’).textContent = ms + ‘:’ + ss;
+document.getElementById(‘ringFg’).style.strokeDashoffset = String(CIRC * (1 - secs/currentTimerTotal));
+}
+function setNextDuration(mins) {
+nextTimerSec = mins * 60;
+var btns = document.getElementById(‘timerPresets’).getElementsByTagName(‘button’);
+for (var i=0; i<btns.length; i++) btns[i].className = ‘timer-preset-btn’;
+var presets = [30,45,60,90,120];
+for (var i=0; i<presets.length; i++) { if (presets[i] === mins) { btns[i].className = ‘timer-preset-btn active’; break; } }
+document.getElementById(‘customMinutes’).value = ‘’;
+showToast(‘Naechster Timer: ’ + mins + ’ Min’);
+}
+function setCustomDuration(val) {
+var mins = parseInt(val);
+if (!mins || mins < 1) return;
+nextTimerSec = Math.min(480, mins) * 60;
+var btns = document.getElementById(‘timerPresets’).getElementsByTagName(‘button’);
+for (var i=0; i<btns.length; i++) btns[i].className = ‘timer-preset-btn’;
+}
 
-function endDay() { stopTimer(); S.phase = 'done'; showSummaryPanel(); saveToday(); }
-
+// ── END DAY ───────────────────────────────────────────────────────────────
+function confirmEnd() { if (confirm(‘Tag abschliessen?’)) endDay(); }
+function endDay() { stopTimer(); phase = ‘done’; showSummaryPanel(); saveToday(); }
 function showSummaryPanel() {
-  showPhase('done');
-  var sq=0, gm=0, pl=0;
-  for (var i=0; i<S.sets.length; i++) { sq+=S.sets[i].sq; gm+=S.sets[i].gm; pl+=S.sets[i].pl; }
-  document.getElementById('sumSets').textContent = S.sets.length;
-  document.getElementById('sumSq').textContent = sq;
-  document.getElementById('sumGm').textContent = gm;
-  document.getElementById('sumPl').textContent = pl;
-  var span = S.sets.length >= 2 ? S.sets[0].time + '-' + S.sets[S.sets.length-1].time : (S.sets[0] ? S.sets[0].time : '-');
-  document.getElementById('sumSpan').textContent = span;
-  var d = new Date().toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
-
+showPhase(‘done’);
+var active = activeExercises();
+var totals = {};
+for (var i=0; i<active.length; i++) totals[active[i].id] = 0;
+for (var i=0; i<sets.length; i++) {
+var s = sets[i];
+if (s.vals) { for (var id in s.vals) { if (totals[id] !== undefined) totals[id] += s.vals[id]; } }
+else {
+if (s.sq && totals[‘sq’] !== undefined) totals[‘sq’] += s.sq;
+if (s.gm && totals[‘gm’] !== undefined) totals[‘gm’] += s.gm;
+if (s.pl && totals[‘pl’] !== undefined) totals[‘pl’] += s.pl;
 }
-
-
-function resetDay() { if (confirm('Wirklich neu starten?')) { localStorage.removeItem(todayKey()); location.reload(); } }
-
-function confirmClearAll() {
-  if (confirm('ALLE Daten loeschen?')) {
-    var keys = getAllDayKeys();
-    for (var i=0; i<keys.length; i++) localStorage.removeItem(keys[i]);
-    location.reload();
-  }
 }
+var html = ‘<div class="sum-stat"><div class="sum-val" style="color:#b47fff;">’+sets.length+’</div><div class="sum-lbl">Sets</div></div>’;
+for (var i=0; i<active.length; i++) {
+var ex = active[i];
+var v = totals[ex.id] || 0;
+var disp = ex.type === ‘secs’ ? v+‘s’ : String(v);
+html += ‘<div class="sum-stat"><div class="sum-val" style="color:'+ex.color+';">’+disp+’</div><div class="sum-lbl">’+ex.name+’</div></div>’;
+}
+document.getElementById(‘sumGrid’).innerHTML = html;
+}
+function resetDay() { if (confirm(‘Wirklich neu starten?’)) { localStorage.removeItem(todayKey()); location.reload(); } }
 
-function selectEx(ex) {
-  chartEx = ex;
-  var cols = { sq:'#e8ff47', gm:'#47d4ff', pl:'#ff4f6d' };
-  var labels = { sq:'7-Tage Squats', gm:'7-Tage Good Mornings', pl:'7-Tage Plank (Sek)' };
-  var exList = ['sq','gm','pl'];
-  for (var i=0; i<exList.length; i++) {
-    var e = exList[i];
-    var btn = document.getElementById('sel' + e.charAt(0).toUpperCase() + e.slice(1));
-    btn.className = 'ex-sel-btn' + (e === ex ? ' ' + e + '-active' : '');
-  }
-  document.getElementById('chartTitle').textContent = labels[ex];
-  renderWeekChart();
+// ── HISTORY ───────────────────────────────────────────────────────────────
+function getDayTotals(d) {
+var totals = {};
+for (var i=0; i<exercises.length; i++) totals[exercises[i].id] = 0;
+if (!d.sets) return totals;
+for (var i=0; i<d.sets.length; i++) {
+var s = d.sets[i];
+if (s.vals) { for (var id in s.vals) { if (totals[id] !== undefined) totals[id] += s.vals[id]; } }
+else {
+if (s.sq !== undefined && totals[‘sq’] !== undefined) totals[‘sq’] += s.sq;
+if (s.gm !== undefined && totals[‘gm’] !== undefined) totals[‘gm’] += s.gm;
+if (s.pl !== undefined && totals[‘pl’] !== undefined) totals[‘pl’] += s.pl;
+}
+}
+return totals;
 }
 
 function renderHistory() {
-  var keys = getAllDayKeys();
-  var container = document.getElementById('historyDays');
-  histDays = [];
-  for (var i=0; i<keys.length; i++) {
-    try {
-      var parsed = JSON.parse(localStorage.getItem(keys[i]));
-      if (parsed && parsed.sets && parsed.sets.length) {
-        histDays.push({ date: keys[i].replace('hs_',''), sets: parsed.sets });
-      }
-    } catch(e) {}
-  }
-  renderWeekChart();
-  if (!histDays.length) { container.innerHTML = '<div class="hist-empty" style="padding:20px 0;">Noch keine Verlaufsdaten.</div>'; return; }
-  var html = '';
-  var todayStr = new Date().toISOString().slice(0,10);
-  for (var i=0; i<histDays.length; i++) {
-    var d = histDays[i];
-    var sq=0, gm=0, pl=0;
-    for (var j=0; j<d.sets.length; j++) { sq+=d.sets[j].sq; gm+=d.sets[j].gm; pl+=d.sets[j].pl; }
-    var isToday = d.date === todayStr;
-    var dateObj = new Date(d.date + 'T12:00:00');
-    var dow = dateObj.toLocaleDateString('de-DE', {weekday:'short'}).toUpperCase();
-    var dm = dateObj.toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit'});
-    var dateLabel = isToday ? 'HEUTE' : dow + ' ' + dm;
-    html += '<div class="day-card" onclick="showDayDetail(\'' + d.date + '\')">';
-    html += '<div class="day-header"><div class="day-date">' + dateLabel + '</div><div class="day-sets">' + d.sets.length + ' SETS</div></div>';
-    html += '<div class="day-stats">';
-    html += '<div class="day-stat"><div class="day-stat-val sq">' + sq + '</div><div class="day-stat-lbl">Squats</div></div>';
-    html += '<div class="day-stat"><div class="day-stat-val gm">' + gm + '</div><div class="day-stat-lbl">Good M.</div></div>';
-    html += '<div class="day-stat"><div class="day-stat-val pl">' + pl + 's</div><div class="day-stat-lbl">Plank</div></div>';
-    html += '</div></div>';
-  }
-  container.innerHTML = html;
+var keys = getAllDayKeys();
+histDays = [];
+for (var i=0; i<keys.length; i++) {
+try {
+var p = JSON.parse(localStorage.getItem(keys[i]));
+if (p && p.sets && p.sets.length) histDays.push({ date: keys[i].replace(‘hs_’,’’), sets: p.sets });
+} catch(e) {}
+}
+renderChartExBtns();
+renderWeekChart();
+var container = document.getElementById(‘historyDays’);
+if (!histDays.length) { container.innerHTML = ‘<div class="hist-empty" style="padding:20px 0;">Noch keine Verlaufsdaten.</div>’; return; }
+var todayStr = new Date().toISOString().slice(0,10);
+var html = ‘’;
+for (var i=0; i<histDays.length; i++) {
+var d = histDays[i];
+var totals = getDayTotals(d);
+var isToday = d.date === todayStr;
+var dateObj = new Date(d.date + ‘T12:00:00’);
+var dow = dateObj.toLocaleDateString(‘de-DE’,{weekday:‘short’}).toUpperCase();
+var dm = dateObj.toLocaleDateString(‘de-DE’,{day:‘2-digit’,month:‘2-digit’});
+var label = isToday ? ‘HEUTE’ : dow + ’ ’ + dm;
+html += ‘<div class="day-card" onclick="showDayDetail(\''+d.date+'\')">’;
+html += ‘<div class="day-header"><div class="day-date">’+label+’</div><div class="day-sets">’+d.sets.length+’ SETS</div></div>’;
+html += ‘<div class="day-ex-grid">’;
+for (var j=0; j<exercises.length; j++) {
+var ex = exercises[j];
+var v = totals[ex.id];
+if (!v) continue;
+var disp = ex.type === ‘secs’ ? v+‘s’ : String(v);
+html += ‘<div class="day-ex-stat"><div class="day-ex-val" style="color:'+ex.color+';">’+disp+’</div><div class="day-ex-lbl">’+ex.name+’</div></div>’;
+}
+html += ‘</div></div>’;
+}
+container.innerHTML = html;
+}
+
+function renderChartExBtns() {
+var allEx = exercises;
+if (!chartExId && allEx.length) chartExId = allEx[0].id;
+var html = ‘’;
+for (var i=0; i<allEx.length; i++) {
+var ex = allEx[i];
+var sel = ex.id === chartExId ? ’ sel’ : ‘’;
+html += ‘<button class="ex-sel-btn'+sel+'" onclick="selectChartEx(\''+ex.id+'\')">’+ex.name+’</button>’;
+}
+document.getElementById(‘chartExBtns’).innerHTML = html;
+}
+
+function selectChartEx(id) {
+chartExId = id;
+renderChartExBtns();
+var ex = exById(id);
+document.getElementById(‘chartTitle’).textContent = ’7-Tage ’ + (ex ? ex.name : id);
+renderWeekChart();
 }
 
 function renderWeekChart() {
-  var el = document.getElementById('weekBars');
-  var colors = { sq:'#e8ff47', gm:'#47d4ff', pl:'#ff4f6d' };
-  var dayNames = ['So','Mo','Di','Mi','Do','Fr','Sa'];
-  var today = new Date();
-  var todayStr = today.toISOString().slice(0,10);
-  var color = colors[chartEx];
-  var cols = [];
-  for (var i=6; i>=0; i--) {
-    var d = new Date(today); d.setDate(d.getDate() - i);
-    var ds = d.toISOString().slice(0,10);
-    var isToday = i === 0;
-    var val = 0;
-    for (var j=0; j<histDays.length; j++) {
-      if (histDays[j].date === ds) {
-        for (var k=0; k<histDays[j].sets.length; k++) val += histDays[j].sets[k][chartEx];
-        break;
-      }
-    }
-    cols.push({ label: dayNames[d.getDay()], val: val, isToday: isToday, date: ds });
-  }
-  var maxVal = 1;
-  for (var i=0; i<cols.length; i++) if (cols[i].val > maxVal) maxVal = cols[i].val;
-  var html = '';
-  for (var i=0; i<cols.length; i++) {
-    var c = cols[i];
-    var barH = Math.max(2, Math.round((c.val/maxVal)*52));
-    var opacity = c.isToday ? '1' : '0.35';
-    html += '<div class="week-col" onclick="showDayDetail(\'' + c.date + '\')">';
-    html += '<div class="week-val" style="color:' + (c.val ? color : '#2a2a38') + ';">' + (c.val || '') + '</div>';
-    html += '<div class="week-bar" style="height:' + barH + 'px;background:' + color + ';opacity:' + opacity + ';"></div>';
-    html += '<div class="week-lbl">' + c.label + '</div>';
-    html += '</div>';
-  }
-  el.innerHTML = html;
+var el = document.getElementById(‘weekBars’);
+var ex = exById(chartExId);
+var color = ex ? ex.color : ‘#e8ff47’;
+var dayNames = [‘So’,‘Mo’,‘Di’,‘Mi’,‘Do’,‘Fr’,‘Sa’];
+var today = new Date();
+var cols = [];
+for (var i=6; i>=0; i–) {
+var d = new Date(today); d.setDate(d.getDate()-i);
+var ds = d.toISOString().slice(0,10);
+var isToday = i===0;
+var val = 0;
+for (var j=0; j<histDays.length; j++) {
+if (histDays[j].date === ds) { var t = getDayTotals(histDays[j]); val = t[chartExId] || 0; break; }
+}
+cols.push({ label: dayNames[d.getDay()], val: val, isToday: isToday, date: ds });
+}
+var maxVal = 1;
+for (var i=0; i<cols.length; i++) if (cols[i].val > maxVal) maxVal = cols[i].val;
+var html = ‘’;
+for (var i=0; i<cols.length; i++) {
+var c = cols[i];
+var h = Math.max(2, Math.round((c.val/maxVal)*50));
+var op = c.isToday ? ‘1’ : ‘0.35’;
+html += ‘<div class="week-col" onclick="showDayDetail(\''+c.date+'\')">’;
+html += ‘<div class="week-val" style="color:'+(c.val?color:'#2a2a38')+';">’+(c.val||’’)+’</div>’;
+html += ‘<div class="week-bar" style="height:'+h+'px;background:'+color+';opacity:'+op+';"></div>’;
+html += ‘<div class="week-lbl">’+c.label+’</div>’;
+html += ‘</div>’;
+}
+el.innerHTML = html;
 }
 
 function showDayDetail(dateStr) {
-  var d = null;
-  for (var i=0; i<histDays.length; i++) { if (histDays[i].date === dateStr) { d = histDays[i]; break; } }
-  var el = document.getElementById('selectedDay');
-  if (!d || !d.sets || !d.sets.length) { el.style.display = 'none'; return; }
-  var sq=0, gm=0, pl=0;
-  for (var i=0; i<d.sets.length; i++) { sq+=d.sets[i].sq; gm+=d.sets[i].gm; pl+=d.sets[i].pl; }
-  var isToday = dateStr === new Date().toISOString().slice(0,10);
-  var dateObj = new Date(dateStr + 'T12:00:00');
-  var label = isToday ? 'HEUTE' : dateObj.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long'}).toUpperCase();
-  var rows = '';
-  for (var i=0; i<d.sets.length; i++) {
-    var s = d.sets[i];
-    rows += '<div style="display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">';
-    rows += '<div style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#4a4a5a;text-align:center;border:1px solid #1e1e28;padding:2px;">#' + s.n + '</div>';
-    rows += '<div style="display:flex;gap:5px;flex-wrap:wrap;">';
-    rows += '<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#e8ff47;border:1px solid rgba(232,255,71,.2);background:rgba(232,255,71,.04);padding:2px 5px;">SQ ' + s.sq + '</span>';
-    rows += '<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#47d4ff;border:1px solid rgba(71,212,255,.2);background:rgba(71,212,255,.04);padding:2px 5px;">GM ' + s.gm + '</span>';
-    rows += '<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#ff4f6d;border:1px solid rgba(255,79,109,.2);background:rgba(255,79,109,.04);padding:2px 5px;">' + s.pl + 's</span>';
-    rows += '<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#4a4a5a;margin-left:auto;">' + s.time + '</span>';
-    rows += '</div></div>';
-  }
-  el.style.display = 'block';
-  el.innerHTML = '<div style="background:#111116;border:1px solid #b47fff;padding:14px;position:relative;margin-bottom:10px;">' +
-    '<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:#b47fff;"></div>' +
-    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">' +
-    '<div style="font-family:\'Barlow Condensed\',Arial,sans-serif;font-weight:700;font-size:14px;color:#fff;">' + label + '</div>' +
-    '<div style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#b47fff;">' + d.sets.length + ' SETS</div></div>' +
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">' +
-    '<div style="text-align:center;"><div style="font-family:\'Share Tech Mono\',monospace;font-size:22px;color:#e8ff47;font-weight:700;">' + sq + '</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:8px;color:#4a4a5a;margin-top:2px;">SQUATS</div></div>' +
-    '<div style="text-align:center;"><div style="font-family:\'Share Tech Mono\',monospace;font-size:22px;color:#47d4ff;font-weight:700;">' + gm + '</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:8px;color:#4a4a5a;margin-top:2px;">GOOD M.</div></div>' +
-    '<div style="text-align:center;"><div style="font-family:\'Share Tech Mono\',monospace;font-size:22px;color:#ff4f6d;font-weight:700;">' + pl + 's</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:8px;color:#4a4a5a;margin-top:2px;">PLANK</div></div></div>' +
-    '<div style="border-top:1px solid #1e1e28;padding-top:10px;">' + rows + '</div></div>';
-  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+var d = null;
+for (var i=0; i<histDays.length; i++) { if (histDays[i].date === dateStr) { d = histDays[i]; break; } }
+var el = document.getElementById(‘selectedDay’);
+if (!d || !d.sets || !d.sets.length) { el.style.display=‘none’; return; }
+var totals = getDayTotals(d);
+var isToday = dateStr === new Date().toISOString().slice(0,10);
+var dateObj = new Date(dateStr + ‘T12:00:00’);
+var label = isToday ? ‘HEUTE’ : dateObj.toLocaleDateString(‘de-DE’,{weekday:‘long’,day:‘2-digit’,month:‘long’}).toUpperCase();
+var totalsHtml = ‘’;
+for (var i=0; i<exercises.length; i++) {
+var ex = exercises[i]; var v = totals[ex.id]; if (!v) continue;
+var disp = ex.type===‘secs’ ? v+‘s’ : String(v);
+totalsHtml += ‘<div style="text-align:center;"><div style="font-family:\'Share Tech Mono\',monospace;font-size:20px;color:'+ex.color+';font-weight:700;">’+disp+’</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:8px;color:#4a4a5a;margin-top:2px;">’+ex.name.toUpperCase()+’</div></div>’;
+}
+var rowsHtml = ‘’;
+for (var i=0; i<d.sets.length; i++) {
+var s = d.sets[i];
+var chipsHtml = ‘’;
+if (s.vals) {
+for (var id in s.vals) {
+var ex2 = exById(id);
+var n = ex2 ? ex2.name.slice(0,4).toUpperCase() : id.toUpperCase();
+var col = ex2 ? ex2.color : ‘#e8ff47’;
+var u = ex2 && ex2.type===‘secs’ ? ‘s’ : ‘’;
+chipsHtml += ‘<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:'+col+';border:1px solid '+col+'44;background:'+col+'0a;padding:2px 5px;">’+n+’ ‘+s.vals[id]+u+’</span>’;
+}
+} else {
+if (s.sq !== undefined) chipsHtml += ‘<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#e8ff47;border:1px solid #e8ff4744;background:#e8ff470a;padding:2px 5px;">SQ ‘+s.sq+’</span>’;
+if (s.gm !== undefined) chipsHtml += ‘<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#47d4ff;border:1px solid #47d4ff44;background:#47d4ff0a;padding:2px 5px;">GM ‘+s.gm+’</span>’;
+if (s.pl !== undefined) chipsHtml += ‘<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#ff4f6d;border:1px solid #ff4f6d44;background:#ff4f6d0a;padding:2px 5px;">PL ‘+s.pl+‘s</span>’;
+}
+rowsHtml += ‘<div style="display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">’;
+rowsHtml += ‘<div style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#4a4a5a;text-align:center;border:1px solid #1e1e28;padding:2px;">#’+s.n+’</div>’;
+rowsHtml += ‘<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">’+chipsHtml+’<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#4a4a5a;margin-left:auto;">’+s.time+’</span></div>’;
+rowsHtml += ‘</div>’;
+}
+el.style.display = ‘block’;
+el.innerHTML = ‘<div style="background:#111116;border:1px solid #b47fff;padding:14px;position:relative;margin-bottom:10px;">’ +
+‘<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:#b47fff;"></div>’ +
+‘<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">’ +
+‘<div style="font-family:\'Barlow Condensed\',Arial,sans-serif;font-weight:700;font-size:14px;color:#fff;">’+label+’</div>’ +
+‘<div style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#b47fff;">’+d.sets.length+’ SETS</div></div>’ +
+‘<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">’+totalsHtml+’</div>’ +
+‘<div style="border-top:1px solid #1e1e28;padding-top:10px;">’+rowsHtml+’</div></div>’;
+el.scrollIntoView({ behavior:‘smooth’, block:‘nearest’ });
 }
 
+// ── STATS ─────────────────────────────────────────────────────────────────
 function renderStats() {
-  var keys = getAllDayKeys();
-  var sq=0, gm=0, pl=0, sets=0, days=0, bestSets=0, bestSq=0;
-  for (var i=0; i<keys.length; i++) {
-    try {
-      var d = JSON.parse(localStorage.getItem(keys[i]));
-      if (!d || !d.sets || !d.sets.length) continue;
-      days++;
-      var dSq=0;
-      for (var j=0; j<d.sets.length; j++) { sq+=d.sets[j].sq; gm+=d.sets[j].gm; pl+=d.sets[j].pl; dSq+=d.sets[j].sq; }
-      sets += d.sets.length;
-      if (d.sets.length > bestSets) bestSets = d.sets.length;
-      if (dSq > bestSq) bestSq = dSq;
-    } catch(e) {}
-  }
-  var streak = 0;
-  var today = new Date();
-  for (var i=0; i<365; i++) {
-    var d = new Date(today); d.setDate(d.getDate()-i);
-    var key = 'hs_' + d.toISOString().slice(0,10);
-    var has = false;
-    try { var p = JSON.parse(localStorage.getItem(key)); has = p && p.sets && p.sets.length > 0; } catch(e) {}
-    if (has) streak++;
-    else if (i > 0) break;
-  }
-  document.getElementById('streakNum').textContent = streak;
-  document.getElementById('bestStreak').textContent = streak;
-  document.getElementById('allSq').textContent = sq;
-  document.getElementById('allGm').textContent = gm;
-  document.getElementById('allPl').textContent = pl;
-  document.getElementById('allSets').textContent = sets;
-  document.getElementById('avgSets').textContent = days ? Math.round(sets/days*10)/10 : 0;
-  document.getElementById('avgSq').textContent = days ? Math.round(sq/days) : 0;
-  document.getElementById('bestSets').textContent = bestSets;
-  document.getElementById('bestSqDay').textContent = bestSq;
+var keys = getAllDayKeys();
+var totals = {};
+for (var i=0; i<exercises.length; i++) totals[exercises[i].id] = 0;
+var totalSets = 0; var activeDays = 0;
+for (var i=0; i<keys.length; i++) {
+try {
+var d = JSON.parse(localStorage.getItem(keys[i]));
+if (!d || !d.sets || !d.sets.length) continue;
+activeDays++;
+totalSets += d.sets.length;
+var t = getDayTotals(d);
+for (var id in t) { if (totals[id] !== undefined) totals[id] += t[id]; }
+} catch(e) {}
+}
+var streak = 0; var today = new Date();
+for (var i=0; i<365; i++) {
+var d = new Date(today); d.setDate(d.getDate()-i);
+var key = ‘hs_’ + d.toISOString().slice(0,10);
+var has = false;
+try { var p = JSON.parse(localStorage.getItem(key)); has = p && p.sets && p.sets.length > 0; } catch(e) {}
+if (has) streak++;
+else if (i > 0) break;
+}
+document.getElementById(‘streakNum’).textContent = streak;
+document.getElementById(‘bestStreak’).textContent = streak;
+document.getElementById(‘avgSets’).textContent = activeDays ? Math.round(totalSets/activeDays*10)/10 : 0;
+document.getElementById(‘totalDays’).textContent = activeDays;
+var html = ‘’;
+for (var i=0; i<exercises.length; i++) {
+var ex = exercises[i]; var v = totals[ex.id] || 0;
+var disp = ex.type===‘secs’ ? v+‘s’ : String(v);
+html += ‘<div class="big-stat"><div class="big-stat-val" style="color:'+ex.color+';">’+disp+’</div><div class="big-stat-lbl">’+ex.name+’</div></div>’;
+}
+document.getElementById(‘allTimeStats’).innerHTML = html;
 }
 
+// ── SETTINGS ──────────────────────────────────────────────────────────────
+function renderSettings() {
+var html = ‘’;
+for (var i=0; i<exercises.length; i++) {
+var ex = exercises[i];
+var typeLabel = ex.type === ‘secs’ ? ‘Sekunden’ : ‘Wiederholungen’;
+var rangeLabel = ex.min + ‘-’ + ex.max + ’ / Schritt ’ + ex.step;
+var inactive = ex.active ? ‘’ : ’ inactive’;
+html += ‘<div class="settings-ex-card'+inactive+'" style="--ex-col:'+ex.color+';">’;
+html += ‘<div class="sett-row"><div><div class="sett-name">’+ex.name+’</div><div class="sett-type">’+typeLabel+’ | ‘+rangeLabel+’</div></div>’;
+html += ‘<div class="sett-btns">’;
+html += ‘<button class="sett-btn'+(ex.active?' on':'')+'" onclick="toggleExActive(\''+ex.id+'\')">’+( ex.active ? ‘AN’ : ‘AUS’)+’</button>’;
+html += ‘<button class="sett-btn" onclick="editExercise(\''+ex.id+'\')" style="border-color:rgba(180,127,255,.4);color:#b47fff;">EDIT</button>’;
+html += ‘<button class="sett-btn del" onclick="deactivateEx(\''+ex.id+'\')">DEL</button>’;
+html += ‘</div></div></div>’;
+}
+document.getElementById(‘exerciseCards’).innerHTML = html;
+}
+
+function toggleExActive(id) {
+for (var i=0; i<exercises.length; i++) {
+if (exercises[i].id === id) { exercises[i].active = !exercises[i].active; break; }
+}
+saveExercises(); renderSettings(); updateLiveStats(); renderInputRows();
+showToast(‘Gespeichert!’);
+}
+
+function deactivateEx(id) {
+var newList = [];
+for (var i=0; i<exercises.length; i++) {
+if (exercises[i].id !== id) newList.push(exercises[i]);
+}
+exercises = newList;
+saveExercises(); renderSettings(); updateLiveStats();
+showToast(‘Uebung entfernt.’);
+}
+
+function editExercise(id) {
+var ex = exById(id);
+if (!ex) return;
+document.getElementById(‘editExId’).value = id;
+document.getElementById(‘editExName’).value = ex.name;
+document.getElementById(‘editExMin’).value = ex.min;
+document.getElementById(‘editExMax’).value = ex.max;
+document.getElementById(‘editExStep’).value = ex.step;
+selectEditType(ex.type);
+document.getElementById(‘editExForm’).style.display = ‘block’;
+document.getElementById(‘editExForm’).scrollIntoView({ behavior:‘smooth’, block:‘nearest’ });
+}
+
+function selectEditType(t) {
+document.getElementById(‘editTypeReps’).className = ‘type-btn’ + (t===‘reps’?’ sel’:’’);
+document.getElementById(‘editTypeSecs’).className = ‘type-btn’ + (t===‘secs’?’ sel’:’’);
+document.getElementById(‘editExType’).value = t;
+}
+
+function saveEditExercise() {
+var id = document.getElementById(‘editExId’).value;
+var name = document.getElementById(‘editExName’).value.trim();
+var min = parseInt(document.getElementById(‘editExMin’).value);
+var max = parseInt(document.getElementById(‘editExMax’).value);
+var step = parseInt(document.getElementById(‘editExStep’).value) || 1;
+var type = document.getElementById(‘editExType’).value;
+if (!name) { showToast(‘Bitte Namen eingeben!’, true); return; }
+if (!min || !max || min >= max) { showToast(‘Gueltigen Bereich eingeben!’, true); return; }
+for (var i=0; i<exercises.length; i++) {
+if (exercises[i].id === id) {
+exercises[i].name = name;
+exercises[i].min = min;
+exercises[i].max = max;
+exercises[i].step = step;
+exercises[i].type = type;
+break;
+}
+}
+saveExercises();
+document.getElementById(‘editExForm’).style.display = ‘none’;
+renderSettings(); updateLiveStats();
+showToast(name + ’ gespeichert!’);
+}
+
+function toggleAddForm() {
+var f = document.getElementById(‘addExForm’);
+f.style.display = f.style.display === ‘none’ ? ‘block’ : ‘none’;
+}
+
+function selectType(t) {
+newExType = t;
+document.getElementById(‘typeReps’).className = ‘type-btn’ + (t===‘reps’?’ sel’:’’);
+document.getElementById(‘typeSecs’).className = ‘type-btn’ + (t===‘secs’?’ sel’:’’);
+}
+
+function addExercise() {
+var name = document.getElementById(‘newExName’).value.trim();
+var min = parseInt(document.getElementById(‘newExMin’).value);
+var max = parseInt(document.getElementById(‘newExMax’).value);
+var step = parseInt(document.getElementById(‘newExStep’).value) || 1;
+if (!name) { showToast(‘Bitte Namen eingeben!’, true); return; }
+if (!min || !max || min >= max) { showToast(‘Gueltigen Bereich eingeben!’, true); return; }
+var id = ‘ex_’ + Date.now();
+var color = EX_COLORS[exercises.length % EX_COLORS.length];
+exercises.push({ id:id, name:name, type:newExType, min:min, max:max, step:step, active:true, color:color });
+saveExercises();
+document.getElementById(‘newExName’).value = ‘’;
+document.getElementById(‘newExMin’).value = ‘’;
+document.getElementById(‘newExMax’).value = ‘’;
+document.getElementById(‘newExStep’).value = ‘’;
+document.getElementById(‘addExForm’).style.display = ‘none’;
+renderSettings(); updateLiveStats();
+showToast(name + ’ hinzugefuegt!’);
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────────────────
+function requestNotifPermission() {
+if (!(‘Notification’ in window)) return;
+if (Notification.permission === ‘default’) {
+Notification.requestPermission(function(r) { if (r===‘granted’) showToast(‘Benachrichtigungen aktiviert!’); });
+}
+}
+function scheduleNotif(secs) {
+if (window._notifTimer) clearTimeout(window._notifTimer);
+if (!(‘Notification’ in window) || Notification.permission !== ‘granted’) return;
+window._notifTimer = setTimeout(function() {
+try {
+var n = new Notification(‘Hourly Sets’, { body:‘Zeit fuer dein naechstes Set!’, tag:‘hourly-set’, requireInteraction:true });
+n.onclick = function() { window.focus(); n.close(); };
+} catch(e) {}
+}, secs * 1000);
+}
+
+// ── BACKUP ────────────────────────────────────────────────────────────────
+function exportData() {
+var keys = getAllDayKeys();
+var data = { exercises: exercises, days: {} };
+for (var i=0; i<keys.length; i++) {
+try { data.days[keys[i]] = JSON.parse(localStorage.getItem(keys[i])); } catch(e) {}
+}
+var blob = new Blob([JSON.stringify(data)], { type:‘application/json’ });
+var url = URL.createObjectURL(blob);
+var a = document.createElement(‘a’);
+a.href = url; a.download = ‘hourlysets-’ + new Date().toISOString().slice(0,10) + ‘.json’;
+document.body.appendChild(a); a.click(); document.body.removeChild(a);
+URL.revokeObjectURL(url);
+showToast(‘Export gespeichert!’);
+}
+function importData(input) {
+var file = input.files[0]; if (!file) return;
+var reader = new FileReader();
+reader.onload = function(e) {
+try {
+var data = JSON.parse(e.target.result);
+var count = 0;
+// import exercises if present
+if (data.exercises) { localStorage.setItem(‘hs_exercises’, JSON.stringify(data.exercises)); }
+// import days
+if (data.days) {
+for (var key in data.days) { if (key.indexOf(‘hs_20’)===0) { localStorage.setItem(key, JSON.stringify(data.days[key])); count++; } }
+} else {
+// old format
+for (var key in data) { if (key.indexOf(‘hs_20’)===0) { localStorage.setItem(key, JSON.stringify(data[key])); count++; } }
+}
+showToast(count + ’ Tage importiert!’);
+setTimeout(function() { location.reload(); }, 1500);
+} catch(err) { showToast(‘Fehler beim Import!’, true); }
+};
+reader.readAsText(file); input.value = ‘’;
+}
+function confirmClearAll() {
+if (confirm(‘ALLE Daten loeschen?’)) {
+var keys = getAllDayKeys();
+for (var i=0; i<keys.length; i++) localStorage.removeItem(keys[i]);
+localStorage.removeItem(‘hs_exercises’);
+location.reload();
+}
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
 var toastTimer;
 function showToast(msg, urgent) {
-  var el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show' + (urgent ? ' urgent' : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(function() { el.classList.remove('show'); }, 3500);
-  if (navigator.vibrate) navigator.vibrate(urgent ? [200,100,200] : [40]);
+var el = document.getElementById(‘toast’);
+el.textContent = msg; el.className = ‘toast show’ + (urgent?’ urgent’:’’);
+clearTimeout(toastTimer);
+toastTimer = setTimeout(function() { el.classList.remove(‘show’); }, 3000);
+if (navigator.vibrate) navigator.vibrate(urgent ? [200,100,200] : [40]);
 }
 
+// ── MANIFEST ──────────────────────────────────────────────────────────────
 function injectManifest() {
-  try {
-    var m = JSON.stringify({ name:'Hourly Sets', short_name:'Sets', start_url:'./', display:'standalone', background_color:'#0a0a0c', theme_color:'#0a0a0c', orientation:'portrait' });
-    var blob = new Blob([m], { type:'application/manifest+json' });
-    var link = document.createElement('link'); link.rel = 'manifest'; link.href = URL.createObjectURL(blob);
-    document.head.appendChild(link);
-  } catch(e) {}
+try {
+var m = JSON.stringify({ name:‘Hourly Sets’, short_name:‘Sets’, start_url:’./’, display:‘standalone’, background_color:’#0a0a0c’, theme_color:’#0a0a0c’ });
+var blob = new Blob([m], { type:‘application/manifest+json’ });
+var link = document.createElement(‘link’); link.rel=‘manifest’; link.href=URL.createObjectURL(blob);
+document.head.appendChild(link);
+} catch(e) {}
 }
 
-function setNextDuration(minutes) {
-  nextTimerSec = minutes * 60;
-  var btns = document.getElementById('timerPresets').getElementsByTagName('button');
-  for (var i=0; i<btns.length; i++) {
-    btns[i].className = 'timer-preset-btn';
-  }
-  // find matching preset
-  var presets = [30,45,60,90,120];
-  for (var i=0; i<presets.length; i++) {
-    if (presets[i] === minutes) {
-      btns[i].className = 'timer-preset-btn active';
-      break;
-    }
-  }
-  document.getElementById('customMinutes').value = '';
-  showToast('Naechster Timer: ' + minutes + ' Min');
-}
-
-function setCustomDuration(val) {
-  var mins = parseInt(val);
-  if (!mins || mins < 1) return;
-  if (mins > 480) mins = 480;
-  nextTimerSec = mins * 60;
-  // deactivate presets
-  var btns = document.getElementById('timerPresets').getElementsByTagName('button');
-  for (var i=0; i<btns.length; i++) btns[i].className = 'timer-preset-btn';
-}
-
-
-
-function requestNotifPermission() {
-  if (!('Notification' in window)) return;
-  if (Notification.permission === 'default') {
-    Notification.requestPermission(function(result) {
-      if (result === 'granted') showToast('Benachrichtigungen aktiviert!');
-    });
-  }
-}
-
-function scheduleNotif(secs) {
-  if (window._notifTimer) clearTimeout(window._notifTimer);
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  window._notifTimer = setTimeout(function() {
-    try {
-      var n = new Notification('Hourly Sets', {
-        body: 'Zeit fuer dein naechstes Set!',
-        icon: '',
-        tag: 'hourly-set',
-        requireInteraction: true
-      });
-      n.onclick = function() { window.focus(); n.close(); };
-    } catch(e) {}
-    window._notifTimer = null;
-  }, secs * 1000);
-}
-
-
-function exportData() {
-  var keys = getAllDayKeys();
-  var data = {};
-  for (var i=0; i<keys.length; i++) {
-    try { data[keys[i]] = JSON.parse(localStorage.getItem(keys[i])); } catch(e) {}
-  }
-  var json = JSON.stringify(data);
-  var blob = new Blob([json], { type: 'application/json' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = 'hourlysets-backup-' + new Date().toISOString().slice(0,10) + '.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast('Export gespeichert!');
-}
-
-function importData(input) {
-  var file = input.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      var data = JSON.parse(e.target.result);
-      var count = 0;
-      for (var key in data) {
-        if (key.indexOf('hs_20') === 0) {
-          localStorage.setItem(key, JSON.stringify(data[key]));
-          count++;
-        }
-      }
-      showToast(count + ' Tage importiert!');
-      setTimeout(function() { location.reload(); }, 1500);
-    } catch(err) {
-      showToast('Fehler beim Import!', true);
-    }
-  };
-  reader.readAsText(file);
-  input.value = '';
-}
-
-
+// ── INIT ──────────────────────────────────────────────────────────────────
 function init() {
-  document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'}).toUpperCase();
-  injectManifest();
-  loadToday();
+document.getElementById(‘dateDisplay’).textContent = new Date().toLocaleDateString(‘de-DE’,{weekday:‘short’,day:‘2-digit’,month:‘2-digit’,year:‘numeric’}).toUpperCase();
+injectManifest();
+loadExercises();
+// init currentVals
+for (var i=0; i<exercises.length; i++) {
+var ex = exercises[i];
+currentVals[ex.id] = Math.round((ex.min + ex.max) / 2 / ex.step) * ex.step;
 }
-
+if (!chartExId && exercises.length) chartExId = exercises[0].id;
+updateLiveStats();
+loadToday();
+}
 init();
 </script>
 
