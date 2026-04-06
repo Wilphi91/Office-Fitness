@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -146,7 +145,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 <div class="screen active" id="screenToday">
   <div class="top-bar">
     <div><h1>HOURLY<br><span style="color:#e8ff47;">SETS</span></h1><div class="top-date" id="dateDisplay"></div></div>
-    <div class="top-badge" id="setsBadge">0 SETS</div>
+    <div style="text-align:right;"><div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#2a2a38;letter-spacing:1px;margin-bottom:3px;">v3.2</div><div class="top-badge" id="setsBadge">0 SETS</div></div>
   </div>
   <div class="scr-pad">
     <div class="live-stats" id="liveStats"></div>
@@ -284,38 +283,43 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       </div>
     </div>
 
-```
-<div class="add-ex-form" id="addExForm" style="display:none;">
-  <div class="panel-title" style="margin-bottom:14px;">// NEUE UEBUNG</div>
-  <div class="form-row">
-    <div class="form-label">Name</div>
-    <input type="text" id="newExName" class="form-input" placeholder="z.B. Liegestuetze" maxlength="24">
-  </div>
-  <div class="form-row">
-    <div class="form-label">Typ</div>
-    <div class="type-btns">
-      <button class="type-btn sel" id="typeReps" onclick="selectType('reps')">Wiederholungen</button>
-      <button class="type-btn" id="typeSecs" onclick="selectType('secs')">Sekunden</button>
+    <div class="add-ex-form" id="addExForm" style="display:none;">
+      <div class="panel-title" style="margin-bottom:14px;">// NEUE UEBUNG</div>
+      <div class="form-row">
+        <div class="form-label">Name</div>
+        <input type="text" id="newExName" class="form-input" placeholder="z.B. Liegestuetze" maxlength="24">
+      </div>
+      <div class="form-row">
+        <div class="form-label">Typ</div>
+        <div class="type-btns">
+          <button class="type-btn sel" id="typeReps" onclick="selectType('reps')">Wiederholungen</button>
+          <button class="type-btn" id="typeSecs" onclick="selectType('secs')">Sekunden</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Bereich (Min / Max)</div>
+        <div class="range-row">
+          <input type="number" id="newExMin" class="form-input" placeholder="Min" min="1" max="999">
+          <input type="number" id="newExMax" class="form-input" placeholder="Max" min="1" max="999">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Schritt</div>
+        <input type="number" id="newExStep" class="form-input" placeholder="z.B. 1 oder 5" min="1" max="60">
+      </div>
+      <button class="btn btn-primary" onclick="addExercise()">HINZUFUEGEN</button>
     </div>
-  </div>
-  <div class="form-row">
-    <div class="form-label">Bereich (Min / Max)</div>
-    <div class="range-row">
-      <input type="number" id="newExMin" class="form-input" placeholder="Min" min="1" max="999">
-      <input type="number" id="newExMax" class="form-input" placeholder="Max" min="1" max="999">
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="form-label">Schritt</div>
-    <input type="number" id="newExStep" class="form-input" placeholder="z.B. 1 oder 5" min="1" max="60">
-  </div>
-  <button class="btn btn-primary" onclick="addExercise()">HINZUFUEGEN</button>
-</div>
-```
-
   </div>
 </div>
 <script>
+window.onerror = function(msg, src, line, col, err) {
+  var box = document.getElementById('debugBox');
+  if (!box) return false;
+  box.style.display = 'block';
+  box.innerHTML += '<div style="border-bottom:1px solid #333;padding:4px 0;"><b>ERR line '+line+':</b> '+msg+'</div>';
+  return false;
+};
+
 // ── DEFAULT EXERCISES (legacy compatible) ─────────────────────────────────
 var DEFAULT_EXERCISES = [
   { id:'sq', name:'Squats',        type:'reps', min:10, max:20, step:1,  active:true,  color:'#e8ff47' },
@@ -328,694 +332,694 @@ var EX_COLORS = ['#e8ff47','#47d4ff','#ff4f6d','#b47fff','#ff9f47','#47ffb4','#f
 var exercises = [];
 var currentVals = {};
 var sets = [];
-var phase = ‘start’;
+var phase = 'start';
 var timerInterval = null;
 var timerRemaining = 3600;
 var nextTimerSec = 3600;
 var currentTimerTotal = 3600;
 var nextSetTime = null;
 var histDays = [];
-var chartExId = ‘’;
-var newExType = ‘reps’;
+var chartExId = '';
+var newExType = 'reps';
 
 // ── STORAGE ───────────────────────────────────────────────────────────────
-function todayKey() { return ‘hs_’ + new Date().toISOString().slice(0,10); }
+function todayKey() { return 'hs_' + new Date().toISOString().slice(0,10); }
 function getAllDayKeys() {
-var keys = [];
-for (var i=0; i<localStorage.length; i++) {
-var k = localStorage.key(i);
-if (k && k.indexOf(‘hs_20’) === 0) keys.push(k);
-}
-keys.sort(); keys.reverse(); return keys;
+  var keys = [];
+  for (var i=0; i<localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && k.indexOf('hs_20') === 0) keys.push(k);
+  }
+  keys.sort(); keys.reverse(); return keys;
 }
 function loadExercises() {
-try {
-var raw = localStorage.getItem(‘hs_exercises’);
-if (raw) { exercises = JSON.parse(raw); return; }
-} catch(e) {}
-exercises = JSON.parse(JSON.stringify(DEFAULT_EXERCISES));
-saveExercises();
+  try {
+    var raw = localStorage.getItem('hs_exercises');
+    if (raw) { exercises = JSON.parse(raw); return; }
+  } catch(e) {}
+  exercises = JSON.parse(JSON.stringify(DEFAULT_EXERCISES));
+  saveExercises();
 }
 function saveExercises() {
-try { localStorage.setItem(‘hs_exercises’, JSON.stringify(exercises)); } catch(e) {}
+  try { localStorage.setItem('hs_exercises', JSON.stringify(exercises)); } catch(e) {}
 }
 function saveToday() {
-try { localStorage.setItem(todayKey(), JSON.stringify({ sets:sets, phase:phase, nextSetTime:nextSetTime })); } catch(e) {}
+  try { localStorage.setItem(todayKey(), JSON.stringify({ sets:sets, phase:phase, nextSetTime:nextSetTime })); } catch(e) {}
 }
 function loadToday() {
-try {
-var raw = localStorage.getItem(todayKey());
-if (!raw) return;
-var d = JSON.parse(raw);
-sets = d.sets || [];
-updateLiveStats(); renderTodayLog(); updateBadge();
-if (d.phase === ‘done’) { showSummaryPanel(); return; }
-if (d.phase === ‘timer’ && d.nextSetTime) {
-var rem = Math.round((new Date(d.nextSetTime) - Date.now()) / 1000);
-if (rem > 0) { nextSetTime = new Date(d.nextSetTime); showPhase(‘timer’); startTimer(rem); return; }
-else { showPhase(‘input’); showToast(‘Bereit fuers naechste Set!’, true); return; }
-}
-if (sets.length > 0 && d.phase === ‘input’) showPhase(‘input’);
-} catch(e) {}
+  try {
+    var raw = localStorage.getItem(todayKey());
+    if (!raw) return;
+    var d = JSON.parse(raw);
+    sets = d.sets || [];
+    updateLiveStats(); renderTodayLog(); updateBadge();
+    if (d.phase === 'done') { showSummaryPanel(); return; }
+    if (d.phase === 'timer' && d.nextSetTime) {
+      var rem = Math.round((new Date(d.nextSetTime) - Date.now()) / 1000);
+      if (rem > 0) { nextSetTime = new Date(d.nextSetTime); showPhase('timer'); startTimer(rem); return; }
+      else { showPhase('input'); showToast('Bereit fuers naechste Set!', true); return; }
+    }
+    if (sets.length > 0 && d.phase === 'input') showPhase('input');
+  } catch(e) {}
 }
 
 // ── TABS ──────────────────────────────────────────────────────────────────
 function switchTab(tab) {
-var tabs = [‘today’,‘history’,‘stats’,‘settings’];
-for (var i=0; i<tabs.length; i++) {
-var n = tabs[i]; var cap = n.charAt(0).toUpperCase()+n.slice(1);
-document.getElementById(‘screen’+cap).classList.remove(‘active’);
-document.getElementById(‘tab’+cap).classList.remove(‘active’);
-}
-var c = tab.charAt(0).toUpperCase()+tab.slice(1);
-document.getElementById(‘screen’+c).classList.add(‘active’);
-document.getElementById(‘tab’+c).classList.add(‘active’);
-if (tab === ‘history’) renderHistory();
-if (tab === ‘stats’) renderStats();
-if (tab === ‘settings’) renderSettings();
+  var tabs = ['today','history','stats','settings'];
+  for (var i=0; i<tabs.length; i++) {
+    var n = tabs[i]; var cap = n.charAt(0).toUpperCase()+n.slice(1);
+    document.getElementById('screen'+cap).classList.remove('active');
+    document.getElementById('tab'+cap).classList.remove('active');
+  }
+  var c = tab.charAt(0).toUpperCase()+tab.slice(1);
+  document.getElementById('screen'+c).classList.add('active');
+  document.getElementById('tab'+c).classList.add('active');
+  if (tab === 'history') renderHistory();
+  if (tab === 'stats') renderStats();
+  if (tab === 'settings') renderSettings();
 }
 
 // ── PHASE ─────────────────────────────────────────────────────────────────
 function showPhase(name) {
-var ps = [‘panelStart’,‘panelInput’,‘panelTimer’,‘panelSummary’];
-for (var i=0; i<ps.length; i++) document.getElementById(ps[i]).style.display = ‘none’;
-phase = name;
-var map = { start:‘panelStart’, input:‘panelInput’, timer:‘panelTimer’, done:‘panelSummary’ };
-if (map[name]) document.getElementById(map[name]).style.display = ‘block’;
-saveToday();
+  var ps = ['panelStart','panelInput','panelTimer','panelSummary'];
+  for (var i=0; i<ps.length; i++) document.getElementById(ps[i]).style.display = 'none';
+  phase = name;
+  var map = { start:'panelStart', input:'panelInput', timer:'panelTimer', done:'panelSummary' };
+  if (map[name]) document.getElementById(map[name]).style.display = 'block';
+  saveToday();
 }
-function startInputPhase() { stopTimer(); renderInputRows(); showPhase(‘input’); }
+function startInputPhase() { stopTimer(); renderInputRows(); showPhase('input'); }
 
 // ── EXERCISES ─────────────────────────────────────────────────────────────
 function activeExercises() {
-var out = [];
-for (var i=0; i<exercises.length; i++) { if (exercises[i].active) out.push(exercises[i]); }
-return out;
+  var out = [];
+  for (var i=0; i<exercises.length; i++) { if (exercises[i].active) out.push(exercises[i]); }
+  return out;
 }
 function exById(id) {
-for (var i=0; i<exercises.length; i++) { if (exercises[i].id === id) return exercises[i]; }
-return null;
+  for (var i=0; i<exercises.length; i++) { if (exercises[i].id === id) return exercises[i]; }
+  return null;
 }
 
 // ── INPUT ROWS ────────────────────────────────────────────────────────────
 function renderInputRows() {
-var active = activeExercises();
-// init currentVals with defaults
-for (var i=0; i<active.length; i++) {
-var ex = active[i];
-if (!currentVals[ex.id]) currentVals[ex.id] = Math.round((ex.min + ex.max) / 2 / ex.step) * ex.step;
-}
-var html = ‘’;
-for (var i=0; i<active.length; i++) {
-var ex = active[i];
-var val = currentVals[ex.id] || ex.min;
-var unitLabel = ex.type === ‘secs’ ? ‘SEK’ : ‘WDH’;
-var rangeLabel = ex.min + ‘-’ + ex.max + ’ ’ + unitLabel;
-html += ‘<div class="ex-row">’;
-html += ‘<div><div class="ex-name">’ + ex.name + ‘</div><div class="ex-sub">’ + rangeLabel + ‘</div></div>’;
-html += ‘<div class="ctrl">’;
-html += ‘<button class="qty-btn" onclick="changeVal(\'' + ex.id + '\',-1)">-</button>’;
-html += ‘<div class="qty-val" id="val_' + ex.id + '">’ + val + ‘</div>’;
-html += ‘<button class="qty-btn" onclick="changeVal(\'' + ex.id + '\',1)">+</button>’;
-html += ‘<div class="unit">’ + unitLabel + ‘</div>’;
-html += ‘</div></div>’;
-}
-document.getElementById(‘inputRows’).innerHTML = html;
+  var active = activeExercises();
+  // init currentVals with defaults
+  for (var i=0; i<active.length; i++) {
+    var ex = active[i];
+    if (!currentVals[ex.id]) currentVals[ex.id] = Math.round((ex.min + ex.max) / 2 / ex.step) * ex.step;
+  }
+  var html = '';
+  for (var i=0; i<active.length; i++) {
+    var ex = active[i];
+    var val = currentVals[ex.id] || ex.min;
+    var unitLabel = ex.type === 'secs' ? 'SEK' : 'WDH';
+    var rangeLabel = ex.min + '-' + ex.max + ' ' + unitLabel;
+    html += '<div class="ex-row">';
+    html += '<div><div class="ex-name">' + ex.name + '</div><div class="ex-sub">' + rangeLabel + '</div></div>';
+    html += '<div class="ctrl">';
+    html += '<button class="qty-btn" onclick="changeVal(\'' + ex.id + '\',-1)">-</button>';
+    html += '<div class="qty-val" id="val_' + ex.id + '">' + val + '</div>';
+    html += '<button class="qty-btn" onclick="changeVal(\'' + ex.id + '\',1)">+</button>';
+    html += '<div class="unit">' + unitLabel + '</div>';
+    html += '</div></div>';
+  }
+  document.getElementById('inputRows').innerHTML = html;
 }
 
 function changeVal(id, dir) {
-var ex = exById(id);
-if (!ex) return;
-var cur = currentVals[id] || ex.min;
-cur = Math.min(ex.max, Math.max(ex.min, cur + dir * ex.step));
-currentVals[id] = cur;
-var el = document.getElementById(‘val_’ + id);
-if (el) el.textContent = cur;
+  var ex = exById(id);
+  if (!ex) return;
+  var cur = currentVals[id] || ex.min;
+  cur = Math.min(ex.max, Math.max(ex.min, cur + dir * ex.step));
+  currentVals[id] = cur;
+  var el = document.getElementById('val_' + id);
+  if (el) el.textContent = cur;
 }
 
 // ── LOG SET ───────────────────────────────────────────────────────────────
 function logSet() {
-var now = new Date();
-var active = activeExercises();
-var vals = {};
-for (var i=0; i<active.length; i++) {
-vals[active[i].id] = currentVals[active[i].id] || active[i].min;
-}
-sets.push({ n: sets.length+1, vals: vals, time: now.toTimeString().slice(0,5) });
-updateLiveStats(); renderTodayLog(); updateBadge();
-nextSetTime = new Date(now.getTime() + nextTimerSec * 1000);
-showPhase(‘timer’); startTimer(nextTimerSec); saveToday();
-showToast(‘Set #’ + sets.length + ’ gespeichert!’);
+  var now = new Date();
+  var active = activeExercises();
+  var vals = {};
+  for (var i=0; i<active.length; i++) {
+    vals[active[i].id] = currentVals[active[i].id] || active[i].min;
+  }
+  sets.push({ n: sets.length+1, vals: vals, time: now.toTimeString().slice(0,5) });
+  updateLiveStats(); renderTodayLog(); updateBadge();
+  nextSetTime = new Date(now.getTime() + nextTimerSec * 1000);
+  showPhase('timer'); startTimer(nextTimerSec); saveToday();
+  showToast('Set #' + sets.length + ' gespeichert!');
 }
 
 // ── LIVE STATS ────────────────────────────────────────────────────────────
 function updateLiveStats() {
-var active = activeExercises();
-var totals = {};
-for (var i=0; i<active.length; i++) totals[active[i].id] = 0;
-for (var i=0; i<sets.length; i++) {
-var s = sets[i];
-for (var id in s.vals) { if (totals[id] !== undefined) totals[id] += s.vals[id]; }
-// legacy support
-if (s.sq !== undefined && totals[‘sq’] !== undefined) totals[‘sq’] += s.sq;
-if (s.gm !== undefined && totals[‘gm’] !== undefined) totals[‘gm’] += s.gm;
-if (s.pl !== undefined && totals[‘pl’] !== undefined) totals[‘pl’] += s.pl;
-}
-var html = ‘’;
-for (var i=0; i<active.length; i++) {
-var ex = active[i];
-var val = totals[ex.id] || 0;
-var disp = ex.type === ‘secs’ ? val+‘s’ : String(val);
-html += ‘<div class="ls-card"><div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:'+ex.color+';"></div>’;
-html += ‘<div class="ls-val">’+disp+’</div>’;
-html += ‘<div class="ls-label">’+ex.name+’</div>’;
-html += ‘</div>’;
-}
-document.getElementById(‘liveStats’).innerHTML = html;
+  var active = activeExercises();
+  var totals = {};
+  for (var i=0; i<active.length; i++) totals[active[i].id] = 0;
+  for (var i=0; i<sets.length; i++) {
+    var s = sets[i];
+    for (var id in s.vals) { if (totals[id] !== undefined) totals[id] += s.vals[id]; }
+    // legacy support
+    if (s.sq !== undefined && totals['sq'] !== undefined) totals['sq'] += s.sq;
+    if (s.gm !== undefined && totals['gm'] !== undefined) totals['gm'] += s.gm;
+    if (s.pl !== undefined && totals['pl'] !== undefined) totals['pl'] += s.pl;
+  }
+  var html = '';
+  for (var i=0; i<active.length; i++) {
+    var ex = active[i];
+    var val = totals[ex.id] || 0;
+    var disp = ex.type === 'secs' ? val+'s' : String(val);
+    html += '<div class="ls-card"><div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:'+ex.color+';"></div>';
+    html += '<div class="ls-val">'+disp+'</div>';
+    html += '<div class="ls-label">'+ex.name+'</div>';
+    html += '</div>';
+  }
+  document.getElementById('liveStats').innerHTML = html;
 }
 
 // ── TODAY LOG ─────────────────────────────────────────────────────────────
 function renderTodayLog() {
-var el = document.getElementById(‘historyList’);
-if (!sets.length) { el.innerHTML = ‘<div class="hist-empty">Noch keine Sets - los geht's!</div>’; return; }
-var html = ‘’;
-var rev = sets.slice().reverse();
-for (var i=0; i<rev.length; i++) {
-var s = rev[i];
-html += ‘<div class="set-entry">’;
-html += ‘<div class="set-num">#’+s.n+’</div>’;
-html += ‘<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;flex:1;">’;
-html += ‘<div class="set-chips">’;
-// new format
-if (s.vals) {
-for (var id in s.vals) {
-var ex = exById(id);
-var name = ex ? ex.name.slice(0,4).toUpperCase() : id.toUpperCase();
-var col = ex ? ex.color : ‘#e8ff47’;
-var unit = ex && ex.type === ‘secs’ ? ‘s’ : ‘’;
-html += ‘<div class="chip" style="color:'+col+';border-color:'+col+'44;background:'+col+'0a;">’+name+’ ‘+s.vals[id]+unit+’</div>’;
-}
-} else {
-// legacy sq/gm/pl
-if (s.sq !== undefined) html += ‘<div class="chip" style="color:#e8ff47;border-color:#e8ff4744;background:#e8ff470a;">SQ ‘+s.sq+’</div>’;
-if (s.gm !== undefined) html += ‘<div class="chip" style="color:#47d4ff;border-color:#47d4ff44;background:#47d4ff0a;">GM ‘+s.gm+’</div>’;
-if (s.pl !== undefined) html += ‘<div class="chip" style="color:#ff4f6d;border-color:#ff4f6d44;background:#ff4f6d0a;">PL ‘+s.pl+‘s</div>’;
-}
-html += ‘</div>’;
-html += ‘<span class="set-time">’+s.time+’</span>’;
-html += ‘</div></div>’;
-}
-el.innerHTML = html;
+  var el = document.getElementById('historyList');
+  if (!sets.length) { el.innerHTML = '<div class="hist-empty">Noch keine Sets - los geht\'s!</div>'; return; }
+  var html = '';
+  var rev = sets.slice().reverse();
+  for (var i=0; i<rev.length; i++) {
+    var s = rev[i];
+    html += '<div class="set-entry">';
+    html += '<div class="set-num">#'+s.n+'</div>';
+    html += '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;flex:1;">';
+    html += '<div class="set-chips">';
+    // new format
+    if (s.vals) {
+      for (var id in s.vals) {
+        var ex = exById(id);
+        var name = ex ? ex.name.slice(0,4).toUpperCase() : id.toUpperCase();
+        var col = ex ? ex.color : '#e8ff47';
+        var unit = ex && ex.type === 'secs' ? 's' : '';
+        html += '<div class="chip" style="color:'+col+';border-color:'+col+'44;background:'+col+'0a;">'+name+' '+s.vals[id]+unit+'</div>';
+      }
+    } else {
+      // legacy sq/gm/pl
+      if (s.sq !== undefined) html += '<div class="chip" style="color:#e8ff47;border-color:#e8ff4744;background:#e8ff470a;">SQ '+s.sq+'</div>';
+      if (s.gm !== undefined) html += '<div class="chip" style="color:#47d4ff;border-color:#47d4ff44;background:#47d4ff0a;">GM '+s.gm+'</div>';
+      if (s.pl !== undefined) html += '<div class="chip" style="color:#ff4f6d;border-color:#ff4f6d44;background:#ff4f6d0a;">PL '+s.pl+'s</div>';
+    }
+    html += '</div>';
+    html += '<span class="set-time">'+s.time+'</span>';
+    html += '</div></div>';
+  }
+  el.innerHTML = html;
 }
 
-function updateBadge() { document.getElementById(‘setsBadge’).textContent = sets.length + ’ SETS’; }
+function updateBadge() { document.getElementById('setsBadge').textContent = sets.length + ' SETS'; }
 
 // ── TIMER ─────────────────────────────────────────────────────────────────
 var CIRC = 421;
 function startTimer(secs) {
-stopTimer();
-currentTimerTotal = secs;
-timerRemaining = secs;
-updateTimerUI(secs);
-var nextStr = nextSetTime ? nextSetTime.toTimeString().slice(0,5) : ‘-’;
-document.getElementById(‘timerMeta’).textContent = ‘Naechstes Set: ’ + nextStr + ’ Uhr’;
-requestNotifPermission();
-scheduleNotif(secs);
-timerInterval = setInterval(function() {
-timerRemaining–;
-updateTimerUI(timerRemaining);
-if (timerRemaining <= 300) document.getElementById(‘ringFg’).classList.add(‘urgent’);
-if (timerRemaining <= 0) {
-stopTimer(); showToast(‘Zeit fuers naechste Set!’, true);
-renderInputRows(); showPhase(‘input’);
-if (navigator.vibrate) navigator.vibrate([300,100,300]);
-saveToday();
-}
-}, 1000);
+  stopTimer();
+  currentTimerTotal = secs;
+  timerRemaining = secs;
+  updateTimerUI(secs);
+  var nextStr = nextSetTime ? nextSetTime.toTimeString().slice(0,5) : '-';
+  document.getElementById('timerMeta').textContent = 'Naechstes Set: ' + nextStr + ' Uhr';
+  requestNotifPermission();
+  scheduleNotif(secs);
+  timerInterval = setInterval(function() {
+    timerRemaining--;
+    updateTimerUI(timerRemaining);
+    if (timerRemaining <= 300) document.getElementById('ringFg').classList.add('urgent');
+    if (timerRemaining <= 0) {
+      stopTimer(); showToast('Zeit fuers naechste Set!', true);
+      renderInputRows(); showPhase('input');
+      if (navigator.vibrate) navigator.vibrate([300,100,300]);
+      saveToday();
+    }
+  }, 1000);
 }
 function stopTimer() {
-if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-if (window._notifTimer) { clearTimeout(window._notifTimer); window._notifTimer = null; }
-document.getElementById(‘ringFg’).classList.remove(‘urgent’);
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  if (window._notifTimer) { clearTimeout(window._notifTimer); window._notifTimer = null; }
+  document.getElementById('ringFg').classList.remove('urgent');
 }
 function updateTimerUI(secs) {
-secs = Math.max(0, secs);
-var m = Math.floor(secs/60); var s = secs%60;
-var ms = (m < 10 ? ‘0’ : ‘’) + m; var ss = (s < 10 ? ‘0’ : ‘’) + s;
-document.getElementById(‘timerDisplay’).textContent = ms + ‘:’ + ss;
-document.getElementById(‘ringFg’).style.strokeDashoffset = String(CIRC * (1 - secs/currentTimerTotal));
+  secs = Math.max(0, secs);
+  var m = Math.floor(secs/60); var s = secs%60;
+  var ms = (m < 10 ? '0' : '') + m; var ss = (s < 10 ? '0' : '') + s;
+  document.getElementById('timerDisplay').textContent = ms + ':' + ss;
+  document.getElementById('ringFg').style.strokeDashoffset = String(CIRC * (1 - secs/currentTimerTotal));
 }
 function setNextDuration(mins) {
-nextTimerSec = mins * 60;
-var btns = document.getElementById(‘timerPresets’).getElementsByTagName(‘button’);
-for (var i=0; i<btns.length; i++) btns[i].className = ‘timer-preset-btn’;
-var presets = [30,45,60,90,120];
-for (var i=0; i<presets.length; i++) { if (presets[i] === mins) { btns[i].className = ‘timer-preset-btn active’; break; } }
-document.getElementById(‘customMinutes’).value = ‘’;
-showToast(‘Naechster Timer: ’ + mins + ’ Min’);
+  nextTimerSec = mins * 60;
+  var btns = document.getElementById('timerPresets').getElementsByTagName('button');
+  for (var i=0; i<btns.length; i++) btns[i].className = 'timer-preset-btn';
+  var presets = [30,45,60,90,120];
+  for (var i=0; i<presets.length; i++) { if (presets[i] === mins) { btns[i].className = 'timer-preset-btn active'; break; } }
+  document.getElementById('customMinutes').value = '';
+  showToast('Naechster Timer: ' + mins + ' Min');
 }
 function setCustomDuration(val) {
-var mins = parseInt(val);
-if (!mins || mins < 1) return;
-nextTimerSec = Math.min(480, mins) * 60;
-var btns = document.getElementById(‘timerPresets’).getElementsByTagName(‘button’);
-for (var i=0; i<btns.length; i++) btns[i].className = ‘timer-preset-btn’;
+  var mins = parseInt(val);
+  if (!mins || mins < 1) return;
+  nextTimerSec = Math.min(480, mins) * 60;
+  var btns = document.getElementById('timerPresets').getElementsByTagName('button');
+  for (var i=0; i<btns.length; i++) btns[i].className = 'timer-preset-btn';
 }
 
 // ── END DAY ───────────────────────────────────────────────────────────────
-function confirmEnd() { if (confirm(‘Tag abschliessen?’)) endDay(); }
-function endDay() { stopTimer(); phase = ‘done’; showSummaryPanel(); saveToday(); }
+function confirmEnd() { if (confirm('Tag abschliessen?')) endDay(); }
+function endDay() { stopTimer(); phase = 'done'; showSummaryPanel(); saveToday(); }
 function showSummaryPanel() {
-showPhase(‘done’);
-var active = activeExercises();
-var totals = {};
-for (var i=0; i<active.length; i++) totals[active[i].id] = 0;
-for (var i=0; i<sets.length; i++) {
-var s = sets[i];
-if (s.vals) { for (var id in s.vals) { if (totals[id] !== undefined) totals[id] += s.vals[id]; } }
-else {
-if (s.sq && totals[‘sq’] !== undefined) totals[‘sq’] += s.sq;
-if (s.gm && totals[‘gm’] !== undefined) totals[‘gm’] += s.gm;
-if (s.pl && totals[‘pl’] !== undefined) totals[‘pl’] += s.pl;
+  showPhase('done');
+  var active = activeExercises();
+  var totals = {};
+  for (var i=0; i<active.length; i++) totals[active[i].id] = 0;
+  for (var i=0; i<sets.length; i++) {
+    var s = sets[i];
+    if (s.vals) { for (var id in s.vals) { if (totals[id] !== undefined) totals[id] += s.vals[id]; } }
+    else {
+      if (s.sq && totals['sq'] !== undefined) totals['sq'] += s.sq;
+      if (s.gm && totals['gm'] !== undefined) totals['gm'] += s.gm;
+      if (s.pl && totals['pl'] !== undefined) totals['pl'] += s.pl;
+    }
+  }
+  var html = '<div class="sum-stat"><div class="sum-val" style="color:#b47fff;">'+sets.length+'</div><div class="sum-lbl">Sets</div></div>';
+  for (var i=0; i<active.length; i++) {
+    var ex = active[i];
+    var v = totals[ex.id] || 0;
+    var disp = ex.type === 'secs' ? v+'s' : String(v);
+    html += '<div class="sum-stat"><div class="sum-val" style="color:'+ex.color+';">'+disp+'</div><div class="sum-lbl">'+ex.name+'</div></div>';
+  }
+  document.getElementById('sumGrid').innerHTML = html;
 }
-}
-var html = ‘<div class="sum-stat"><div class="sum-val" style="color:#b47fff;">’+sets.length+’</div><div class="sum-lbl">Sets</div></div>’;
-for (var i=0; i<active.length; i++) {
-var ex = active[i];
-var v = totals[ex.id] || 0;
-var disp = ex.type === ‘secs’ ? v+‘s’ : String(v);
-html += ‘<div class="sum-stat"><div class="sum-val" style="color:'+ex.color+';">’+disp+’</div><div class="sum-lbl">’+ex.name+’</div></div>’;
-}
-document.getElementById(‘sumGrid’).innerHTML = html;
-}
-function resetDay() { if (confirm(‘Wirklich neu starten?’)) { localStorage.removeItem(todayKey()); location.reload(); } }
+function resetDay() { if (confirm('Wirklich neu starten?')) { localStorage.removeItem(todayKey()); location.reload(); } }
 
 // ── HISTORY ───────────────────────────────────────────────────────────────
 function getDayTotals(d) {
-var totals = {};
-for (var i=0; i<exercises.length; i++) totals[exercises[i].id] = 0;
-if (!d.sets) return totals;
-for (var i=0; i<d.sets.length; i++) {
-var s = d.sets[i];
-if (s.vals) { for (var id in s.vals) { if (totals[id] !== undefined) totals[id] += s.vals[id]; } }
-else {
-if (s.sq !== undefined && totals[‘sq’] !== undefined) totals[‘sq’] += s.sq;
-if (s.gm !== undefined && totals[‘gm’] !== undefined) totals[‘gm’] += s.gm;
-if (s.pl !== undefined && totals[‘pl’] !== undefined) totals[‘pl’] += s.pl;
-}
-}
-return totals;
+  var totals = {};
+  for (var i=0; i<exercises.length; i++) totals[exercises[i].id] = 0;
+  if (!d.sets) return totals;
+  for (var i=0; i<d.sets.length; i++) {
+    var s = d.sets[i];
+    if (s.vals) { for (var id in s.vals) { if (totals[id] !== undefined) totals[id] += s.vals[id]; } }
+    else {
+      if (s.sq !== undefined && totals['sq'] !== undefined) totals['sq'] += s.sq;
+      if (s.gm !== undefined && totals['gm'] !== undefined) totals['gm'] += s.gm;
+      if (s.pl !== undefined && totals['pl'] !== undefined) totals['pl'] += s.pl;
+    }
+  }
+  return totals;
 }
 
 function renderHistory() {
-var keys = getAllDayKeys();
-histDays = [];
-for (var i=0; i<keys.length; i++) {
-try {
-var p = JSON.parse(localStorage.getItem(keys[i]));
-if (p && p.sets && p.sets.length) histDays.push({ date: keys[i].replace(‘hs_’,’’), sets: p.sets });
-} catch(e) {}
-}
-renderChartExBtns();
-renderWeekChart();
-var container = document.getElementById(‘historyDays’);
-if (!histDays.length) { container.innerHTML = ‘<div class="hist-empty" style="padding:20px 0;">Noch keine Verlaufsdaten.</div>’; return; }
-var todayStr = new Date().toISOString().slice(0,10);
-var html = ‘’;
-for (var i=0; i<histDays.length; i++) {
-var d = histDays[i];
-var totals = getDayTotals(d);
-var isToday = d.date === todayStr;
-var dateObj = new Date(d.date + ‘T12:00:00’);
-var dow = dateObj.toLocaleDateString(‘de-DE’,{weekday:‘short’}).toUpperCase();
-var dm = dateObj.toLocaleDateString(‘de-DE’,{day:‘2-digit’,month:‘2-digit’});
-var label = isToday ? ‘HEUTE’ : dow + ’ ’ + dm;
-html += ‘<div class="day-card" onclick="showDayDetail(\''+d.date+'\')">’;
-html += ‘<div class="day-header"><div class="day-date">’+label+’</div><div class="day-sets">’+d.sets.length+’ SETS</div></div>’;
-html += ‘<div class="day-ex-grid">’;
-for (var j=0; j<exercises.length; j++) {
-var ex = exercises[j];
-var v = totals[ex.id];
-if (!v) continue;
-var disp = ex.type === ‘secs’ ? v+‘s’ : String(v);
-html += ‘<div class="day-ex-stat"><div class="day-ex-val" style="color:'+ex.color+';">’+disp+’</div><div class="day-ex-lbl">’+ex.name+’</div></div>’;
-}
-html += ‘</div></div>’;
-}
-container.innerHTML = html;
+  var keys = getAllDayKeys();
+  histDays = [];
+  for (var i=0; i<keys.length; i++) {
+    try {
+      var p = JSON.parse(localStorage.getItem(keys[i]));
+      if (p && p.sets && p.sets.length) histDays.push({ date: keys[i].replace('hs_',''), sets: p.sets });
+    } catch(e) {}
+  }
+  renderChartExBtns();
+  renderWeekChart();
+  var container = document.getElementById('historyDays');
+  if (!histDays.length) { container.innerHTML = '<div class="hist-empty" style="padding:20px 0;">Noch keine Verlaufsdaten.</div>'; return; }
+  var todayStr = new Date().toISOString().slice(0,10);
+  var html = '';
+  for (var i=0; i<histDays.length; i++) {
+    var d = histDays[i];
+    var totals = getDayTotals(d);
+    var isToday = d.date === todayStr;
+    var dateObj = new Date(d.date + 'T12:00:00');
+    var dow = dateObj.toLocaleDateString('de-DE',{weekday:'short'}).toUpperCase();
+    var dm = dateObj.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+    var label = isToday ? 'HEUTE' : dow + ' ' + dm;
+    html += '<div class="day-card" onclick="showDayDetail(\''+d.date+'\')">';
+    html += '<div class="day-header"><div class="day-date">'+label+'</div><div class="day-sets">'+d.sets.length+' SETS</div></div>';
+    html += '<div class="day-ex-grid">';
+    for (var j=0; j<exercises.length; j++) {
+      var ex = exercises[j];
+      var v = totals[ex.id];
+      if (!v) continue;
+      var disp = ex.type === 'secs' ? v+'s' : String(v);
+      html += '<div class="day-ex-stat"><div class="day-ex-val" style="color:'+ex.color+';">'+disp+'</div><div class="day-ex-lbl">'+ex.name+'</div></div>';
+    }
+    html += '</div></div>';
+  }
+  container.innerHTML = html;
 }
 
 function renderChartExBtns() {
-var allEx = exercises;
-if (!chartExId && allEx.length) chartExId = allEx[0].id;
-var html = ‘’;
-for (var i=0; i<allEx.length; i++) {
-var ex = allEx[i];
-var sel = ex.id === chartExId ? ’ sel’ : ‘’;
-html += ‘<button class="ex-sel-btn'+sel+'" onclick="selectChartEx(\''+ex.id+'\')">’+ex.name+’</button>’;
-}
-document.getElementById(‘chartExBtns’).innerHTML = html;
+  var allEx = exercises;
+  if (!chartExId && allEx.length) chartExId = allEx[0].id;
+  var html = '';
+  for (var i=0; i<allEx.length; i++) {
+    var ex = allEx[i];
+    var sel = ex.id === chartExId ? ' sel' : '';
+    html += '<button class="ex-sel-btn'+sel+'" onclick="selectChartEx(\''+ex.id+'\')">'+ex.name+'</button>';
+  }
+  document.getElementById('chartExBtns').innerHTML = html;
 }
 
 function selectChartEx(id) {
-chartExId = id;
-renderChartExBtns();
-var ex = exById(id);
-document.getElementById(‘chartTitle’).textContent = ’7-Tage ’ + (ex ? ex.name : id);
-renderWeekChart();
+  chartExId = id;
+  renderChartExBtns();
+  var ex = exById(id);
+  document.getElementById('chartTitle').textContent = '7-Tage ' + (ex ? ex.name : id);
+  renderWeekChart();
 }
 
 function renderWeekChart() {
-var el = document.getElementById(‘weekBars’);
-var ex = exById(chartExId);
-var color = ex ? ex.color : ‘#e8ff47’;
-var dayNames = [‘So’,‘Mo’,‘Di’,‘Mi’,‘Do’,‘Fr’,‘Sa’];
-var today = new Date();
-var cols = [];
-for (var i=6; i>=0; i–) {
-var d = new Date(today); d.setDate(d.getDate()-i);
-var ds = d.toISOString().slice(0,10);
-var isToday = i===0;
-var val = 0;
-for (var j=0; j<histDays.length; j++) {
-if (histDays[j].date === ds) { var t = getDayTotals(histDays[j]); val = t[chartExId] || 0; break; }
-}
-cols.push({ label: dayNames[d.getDay()], val: val, isToday: isToday, date: ds });
-}
-var maxVal = 1;
-for (var i=0; i<cols.length; i++) if (cols[i].val > maxVal) maxVal = cols[i].val;
-var html = ‘’;
-for (var i=0; i<cols.length; i++) {
-var c = cols[i];
-var h = Math.max(2, Math.round((c.val/maxVal)*50));
-var op = c.isToday ? ‘1’ : ‘0.35’;
-html += ‘<div class="week-col" onclick="showDayDetail(\''+c.date+'\')">’;
-html += ‘<div class="week-val" style="color:'+(c.val?color:'#2a2a38')+';">’+(c.val||’’)+’</div>’;
-html += ‘<div class="week-bar" style="height:'+h+'px;background:'+color+';opacity:'+op+';"></div>’;
-html += ‘<div class="week-lbl">’+c.label+’</div>’;
-html += ‘</div>’;
-}
-el.innerHTML = html;
+  var el = document.getElementById('weekBars');
+  var ex = exById(chartExId);
+  var color = ex ? ex.color : '#e8ff47';
+  var dayNames = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  var today = new Date();
+  var cols = [];
+  for (var i=6; i>=0; i--) {
+    var d = new Date(today); d.setDate(d.getDate()-i);
+    var ds = d.toISOString().slice(0,10);
+    var isToday = i===0;
+    var val = 0;
+    for (var j=0; j<histDays.length; j++) {
+      if (histDays[j].date === ds) { var t = getDayTotals(histDays[j]); val = t[chartExId] || 0; break; }
+    }
+    cols.push({ label: dayNames[d.getDay()], val: val, isToday: isToday, date: ds });
+  }
+  var maxVal = 1;
+  for (var i=0; i<cols.length; i++) if (cols[i].val > maxVal) maxVal = cols[i].val;
+  var html = '';
+  for (var i=0; i<cols.length; i++) {
+    var c = cols[i];
+    var h = Math.max(2, Math.round((c.val/maxVal)*50));
+    var op = c.isToday ? '1' : '0.35';
+    html += '<div class="week-col" onclick="showDayDetail(\''+c.date+'\')">';
+    html += '<div class="week-val" style="color:'+(c.val?color:'#2a2a38')+';">'+(c.val||'')+'</div>';
+    html += '<div class="week-bar" style="height:'+h+'px;background:'+color+';opacity:'+op+';"></div>';
+    html += '<div class="week-lbl">'+c.label+'</div>';
+    html += '</div>';
+  }
+  el.innerHTML = html;
 }
 
 function showDayDetail(dateStr) {
-var d = null;
-for (var i=0; i<histDays.length; i++) { if (histDays[i].date === dateStr) { d = histDays[i]; break; } }
-var el = document.getElementById(‘selectedDay’);
-if (!d || !d.sets || !d.sets.length) { el.style.display=‘none’; return; }
-var totals = getDayTotals(d);
-var isToday = dateStr === new Date().toISOString().slice(0,10);
-var dateObj = new Date(dateStr + ‘T12:00:00’);
-var label = isToday ? ‘HEUTE’ : dateObj.toLocaleDateString(‘de-DE’,{weekday:‘long’,day:‘2-digit’,month:‘long’}).toUpperCase();
-var totalsHtml = ‘’;
-for (var i=0; i<exercises.length; i++) {
-var ex = exercises[i]; var v = totals[ex.id]; if (!v) continue;
-var disp = ex.type===‘secs’ ? v+‘s’ : String(v);
-totalsHtml += ‘<div style="text-align:center;"><div style="font-family:\'Share Tech Mono\',monospace;font-size:20px;color:'+ex.color+';font-weight:700;">’+disp+’</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:8px;color:#4a4a5a;margin-top:2px;">’+ex.name.toUpperCase()+’</div></div>’;
-}
-var rowsHtml = ‘’;
-for (var i=0; i<d.sets.length; i++) {
-var s = d.sets[i];
-var chipsHtml = ‘’;
-if (s.vals) {
-for (var id in s.vals) {
-var ex2 = exById(id);
-var n = ex2 ? ex2.name.slice(0,4).toUpperCase() : id.toUpperCase();
-var col = ex2 ? ex2.color : ‘#e8ff47’;
-var u = ex2 && ex2.type===‘secs’ ? ‘s’ : ‘’;
-chipsHtml += ‘<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:'+col+';border:1px solid '+col+'44;background:'+col+'0a;padding:2px 5px;">’+n+’ ‘+s.vals[id]+u+’</span>’;
-}
-} else {
-if (s.sq !== undefined) chipsHtml += ‘<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#e8ff47;border:1px solid #e8ff4744;background:#e8ff470a;padding:2px 5px;">SQ ‘+s.sq+’</span>’;
-if (s.gm !== undefined) chipsHtml += ‘<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#47d4ff;border:1px solid #47d4ff44;background:#47d4ff0a;padding:2px 5px;">GM ‘+s.gm+’</span>’;
-if (s.pl !== undefined) chipsHtml += ‘<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#ff4f6d;border:1px solid #ff4f6d44;background:#ff4f6d0a;padding:2px 5px;">PL ‘+s.pl+‘s</span>’;
-}
-rowsHtml += ‘<div style="display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">’;
-rowsHtml += ‘<div style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#4a4a5a;text-align:center;border:1px solid #1e1e28;padding:2px;">#’+s.n+’</div>’;
-rowsHtml += ‘<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">’+chipsHtml+’<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#4a4a5a;margin-left:auto;">’+s.time+’</span></div>’;
-rowsHtml += ‘</div>’;
-}
-el.style.display = ‘block’;
-el.innerHTML = ‘<div style="background:#111116;border:1px solid #b47fff;padding:14px;position:relative;margin-bottom:10px;">’ +
-‘<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:#b47fff;"></div>’ +
-‘<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">’ +
-‘<div style="font-family:\'Barlow Condensed\',Arial,sans-serif;font-weight:700;font-size:14px;color:#fff;">’+label+’</div>’ +
-‘<div style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#b47fff;">’+d.sets.length+’ SETS</div></div>’ +
-‘<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">’+totalsHtml+’</div>’ +
-‘<div style="border-top:1px solid #1e1e28;padding-top:10px;">’+rowsHtml+’</div></div>’;
-el.scrollIntoView({ behavior:‘smooth’, block:‘nearest’ });
+  var d = null;
+  for (var i=0; i<histDays.length; i++) { if (histDays[i].date === dateStr) { d = histDays[i]; break; } }
+  var el = document.getElementById('selectedDay');
+  if (!d || !d.sets || !d.sets.length) { el.style.display='none'; return; }
+  var totals = getDayTotals(d);
+  var isToday = dateStr === new Date().toISOString().slice(0,10);
+  var dateObj = new Date(dateStr + 'T12:00:00');
+  var label = isToday ? 'HEUTE' : dateObj.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long'}).toUpperCase();
+  var totalsHtml = '';
+  for (var i=0; i<exercises.length; i++) {
+    var ex = exercises[i]; var v = totals[ex.id]; if (!v) continue;
+    var disp = ex.type==='secs' ? v+'s' : String(v);
+    totalsHtml += '<div style="text-align:center;"><div style="font-family:\'Share Tech Mono\',monospace;font-size:20px;color:'+ex.color+';font-weight:700;">'+disp+'</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:8px;color:#4a4a5a;margin-top:2px;">'+ex.name.toUpperCase()+'</div></div>';
+  }
+  var rowsHtml = '';
+  for (var i=0; i<d.sets.length; i++) {
+    var s = d.sets[i];
+    var chipsHtml = '';
+    if (s.vals) {
+      for (var id in s.vals) {
+        var ex2 = exById(id);
+        var n = ex2 ? ex2.name.slice(0,4).toUpperCase() : id.toUpperCase();
+        var col = ex2 ? ex2.color : '#e8ff47';
+        var u = ex2 && ex2.type==='secs' ? 's' : '';
+        chipsHtml += '<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:'+col+';border:1px solid '+col+'44;background:'+col+'0a;padding:2px 5px;">'+n+' '+s.vals[id]+u+'</span>';
+      }
+    } else {
+      if (s.sq !== undefined) chipsHtml += '<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#e8ff47;border:1px solid #e8ff4744;background:#e8ff470a;padding:2px 5px;">SQ '+s.sq+'</span>';
+      if (s.gm !== undefined) chipsHtml += '<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#47d4ff;border:1px solid #47d4ff44;background:#47d4ff0a;padding:2px 5px;">GM '+s.gm+'</span>';
+      if (s.pl !== undefined) chipsHtml += '<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#ff4f6d;border:1px solid #ff4f6d44;background:#ff4f6d0a;padding:2px 5px;">PL '+s.pl+'s</span>';
+    }
+    rowsHtml += '<div style="display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">';
+    rowsHtml += '<div style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#4a4a5a;text-align:center;border:1px solid #1e1e28;padding:2px;">#'+s.n+'</div>';
+    rowsHtml += '<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">'+chipsHtml+'<span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#4a4a5a;margin-left:auto;">'+s.time+'</span></div>';
+    rowsHtml += '</div>';
+  }
+  el.style.display = 'block';
+  el.innerHTML = '<div style="background:#111116;border:1px solid #b47fff;padding:14px;position:relative;margin-bottom:10px;">' +
+    '<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:#b47fff;"></div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">' +
+    '<div style="font-family:\'Barlow Condensed\',Arial,sans-serif;font-weight:700;font-size:14px;color:#fff;">'+label+'</div>' +
+    '<div style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#b47fff;">'+d.sets.length+' SETS</div></div>' +
+    '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">'+totalsHtml+'</div>' +
+    '<div style="border-top:1px solid #1e1e28;padding-top:10px;">'+rowsHtml+'</div></div>';
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 // ── STATS ─────────────────────────────────────────────────────────────────
 function renderStats() {
-var keys = getAllDayKeys();
-var totals = {};
-for (var i=0; i<exercises.length; i++) totals[exercises[i].id] = 0;
-var totalSets = 0; var activeDays = 0;
-for (var i=0; i<keys.length; i++) {
-try {
-var d = JSON.parse(localStorage.getItem(keys[i]));
-if (!d || !d.sets || !d.sets.length) continue;
-activeDays++;
-totalSets += d.sets.length;
-var t = getDayTotals(d);
-for (var id in t) { if (totals[id] !== undefined) totals[id] += t[id]; }
-} catch(e) {}
-}
-var streak = 0; var today = new Date();
-for (var i=0; i<365; i++) {
-var d = new Date(today); d.setDate(d.getDate()-i);
-var key = ‘hs_’ + d.toISOString().slice(0,10);
-var has = false;
-try { var p = JSON.parse(localStorage.getItem(key)); has = p && p.sets && p.sets.length > 0; } catch(e) {}
-if (has) streak++;
-else if (i > 0) break;
-}
-document.getElementById(‘streakNum’).textContent = streak;
-document.getElementById(‘bestStreak’).textContent = streak;
-document.getElementById(‘avgSets’).textContent = activeDays ? Math.round(totalSets/activeDays*10)/10 : 0;
-document.getElementById(‘totalDays’).textContent = activeDays;
-var html = ‘’;
-for (var i=0; i<exercises.length; i++) {
-var ex = exercises[i]; var v = totals[ex.id] || 0;
-var disp = ex.type===‘secs’ ? v+‘s’ : String(v);
-html += ‘<div class="big-stat"><div class="big-stat-val" style="color:'+ex.color+';">’+disp+’</div><div class="big-stat-lbl">’+ex.name+’</div></div>’;
-}
-document.getElementById(‘allTimeStats’).innerHTML = html;
+  var keys = getAllDayKeys();
+  var totals = {};
+  for (var i=0; i<exercises.length; i++) totals[exercises[i].id] = 0;
+  var totalSets = 0; var activeDays = 0;
+  for (var i=0; i<keys.length; i++) {
+    try {
+      var d = JSON.parse(localStorage.getItem(keys[i]));
+      if (!d || !d.sets || !d.sets.length) continue;
+      activeDays++;
+      totalSets += d.sets.length;
+      var t = getDayTotals(d);
+      for (var id in t) { if (totals[id] !== undefined) totals[id] += t[id]; }
+    } catch(e) {}
+  }
+  var streak = 0; var today = new Date();
+  for (var i=0; i<365; i++) {
+    var d = new Date(today); d.setDate(d.getDate()-i);
+    var key = 'hs_' + d.toISOString().slice(0,10);
+    var has = false;
+    try { var p = JSON.parse(localStorage.getItem(key)); has = p && p.sets && p.sets.length > 0; } catch(e) {}
+    if (has) streak++;
+    else if (i > 0) break;
+  }
+  document.getElementById('streakNum').textContent = streak;
+  document.getElementById('bestStreak').textContent = streak;
+  document.getElementById('avgSets').textContent = activeDays ? Math.round(totalSets/activeDays*10)/10 : 0;
+  document.getElementById('totalDays').textContent = activeDays;
+  var html = '';
+  for (var i=0; i<exercises.length; i++) {
+    var ex = exercises[i]; var v = totals[ex.id] || 0;
+    var disp = ex.type==='secs' ? v+'s' : String(v);
+    html += '<div class="big-stat"><div class="big-stat-val" style="color:'+ex.color+';">'+disp+'</div><div class="big-stat-lbl">'+ex.name+'</div></div>';
+  }
+  document.getElementById('allTimeStats').innerHTML = html;
 }
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────
 function renderSettings() {
-var html = ‘’;
-for (var i=0; i<exercises.length; i++) {
-var ex = exercises[i];
-var typeLabel = ex.type === ‘secs’ ? ‘Sekunden’ : ‘Wiederholungen’;
-var rangeLabel = ex.min + ‘-’ + ex.max + ’ / Schritt ’ + ex.step;
-var inactive = ex.active ? ‘’ : ’ inactive’;
-html += ‘<div class="settings-ex-card'+inactive+'" style="--ex-col:'+ex.color+';">’;
-html += ‘<div class="sett-row"><div><div class="sett-name">’+ex.name+’</div><div class="sett-type">’+typeLabel+’ | ‘+rangeLabel+’</div></div>’;
-html += ‘<div class="sett-btns">’;
-html += ‘<button class="sett-btn'+(ex.active?' on':'')+'" onclick="toggleExActive(\''+ex.id+'\')">’+( ex.active ? ‘AN’ : ‘AUS’)+’</button>’;
-html += ‘<button class="sett-btn" onclick="editExercise(\''+ex.id+'\')" style="border-color:rgba(180,127,255,.4);color:#b47fff;">EDIT</button>’;
-html += ‘<button class="sett-btn del" onclick="deactivateEx(\''+ex.id+'\')">DEL</button>’;
-html += ‘</div></div></div>’;
-}
-document.getElementById(‘exerciseCards’).innerHTML = html;
+  var html = '';
+  for (var i=0; i<exercises.length; i++) {
+    var ex = exercises[i];
+    var typeLabel = ex.type === 'secs' ? 'Sekunden' : 'Wiederholungen';
+    var rangeLabel = ex.min + '-' + ex.max + ' / Schritt ' + ex.step;
+    var inactive = ex.active ? '' : ' inactive';
+    html += '<div class="settings-ex-card'+inactive+'" style="--ex-col:'+ex.color+';">';
+    html += '<div class="sett-row"><div><div class="sett-name">'+ex.name+'</div><div class="sett-type">'+typeLabel+' | '+rangeLabel+'</div></div>';
+    html += '<div class="sett-btns">';
+    html += '<button class="sett-btn'+(ex.active?' on':'')+'" onclick="toggleExActive(\''+ex.id+'\')">'+( ex.active ? 'AN' : 'AUS')+'</button>';
+    html += '<button class="sett-btn" onclick="editExercise(\''+ex.id+'\')" style="border-color:rgba(180,127,255,.4);color:#b47fff;">EDIT</button>';
+    html += '<button class="sett-btn del" onclick="deactivateEx(\''+ex.id+'\')">DEL</button>';
+    html += '</div></div></div>';
+  }
+  document.getElementById('exerciseCards').innerHTML = html;
 }
 
 function toggleExActive(id) {
-for (var i=0; i<exercises.length; i++) {
-if (exercises[i].id === id) { exercises[i].active = !exercises[i].active; break; }
-}
-saveExercises(); renderSettings(); updateLiveStats(); renderInputRows();
-showToast(‘Gespeichert!’);
+  for (var i=0; i<exercises.length; i++) {
+    if (exercises[i].id === id) { exercises[i].active = !exercises[i].active; break; }
+  }
+  saveExercises(); renderSettings(); updateLiveStats(); renderInputRows();
+  showToast('Gespeichert!');
 }
 
 function deactivateEx(id) {
-var newList = [];
-for (var i=0; i<exercises.length; i++) {
-if (exercises[i].id !== id) newList.push(exercises[i]);
-}
-exercises = newList;
-saveExercises(); renderSettings(); updateLiveStats();
-showToast(‘Uebung entfernt.’);
+  var newList = [];
+  for (var i=0; i<exercises.length; i++) {
+    if (exercises[i].id !== id) newList.push(exercises[i]);
+  }
+  exercises = newList;
+  saveExercises(); renderSettings(); updateLiveStats();
+  showToast('Uebung entfernt.');
 }
 
 function editExercise(id) {
-var ex = exById(id);
-if (!ex) return;
-document.getElementById(‘editExId’).value = id;
-document.getElementById(‘editExName’).value = ex.name;
-document.getElementById(‘editExMin’).value = ex.min;
-document.getElementById(‘editExMax’).value = ex.max;
-document.getElementById(‘editExStep’).value = ex.step;
-selectEditType(ex.type);
-document.getElementById(‘editExForm’).style.display = ‘block’;
-document.getElementById(‘editExForm’).scrollIntoView({ behavior:‘smooth’, block:‘nearest’ });
+  var ex = exById(id);
+  if (!ex) return;
+  document.getElementById('editExId').value = id;
+  document.getElementById('editExName').value = ex.name;
+  document.getElementById('editExMin').value = ex.min;
+  document.getElementById('editExMax').value = ex.max;
+  document.getElementById('editExStep').value = ex.step;
+  selectEditType(ex.type);
+  document.getElementById('editExForm').style.display = 'block';
+  document.getElementById('editExForm').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 function selectEditType(t) {
-document.getElementById(‘editTypeReps’).className = ‘type-btn’ + (t===‘reps’?’ sel’:’’);
-document.getElementById(‘editTypeSecs’).className = ‘type-btn’ + (t===‘secs’?’ sel’:’’);
-document.getElementById(‘editExType’).value = t;
+  document.getElementById('editTypeReps').className = 'type-btn' + (t==='reps'?' sel':'');
+  document.getElementById('editTypeSecs').className = 'type-btn' + (t==='secs'?' sel':'');
+  document.getElementById('editExType').value = t;
 }
 
 function saveEditExercise() {
-var id = document.getElementById(‘editExId’).value;
-var name = document.getElementById(‘editExName’).value.trim();
-var min = parseInt(document.getElementById(‘editExMin’).value);
-var max = parseInt(document.getElementById(‘editExMax’).value);
-var step = parseInt(document.getElementById(‘editExStep’).value) || 1;
-var type = document.getElementById(‘editExType’).value;
-if (!name) { showToast(‘Bitte Namen eingeben!’, true); return; }
-if (!min || !max || min >= max) { showToast(‘Gueltigen Bereich eingeben!’, true); return; }
-for (var i=0; i<exercises.length; i++) {
-if (exercises[i].id === id) {
-exercises[i].name = name;
-exercises[i].min = min;
-exercises[i].max = max;
-exercises[i].step = step;
-exercises[i].type = type;
-break;
-}
-}
-saveExercises();
-document.getElementById(‘editExForm’).style.display = ‘none’;
-renderSettings(); updateLiveStats();
-showToast(name + ’ gespeichert!’);
+  var id = document.getElementById('editExId').value;
+  var name = document.getElementById('editExName').value.trim();
+  var min = parseInt(document.getElementById('editExMin').value);
+  var max = parseInt(document.getElementById('editExMax').value);
+  var step = parseInt(document.getElementById('editExStep').value) || 1;
+  var type = document.getElementById('editExType').value;
+  if (!name) { showToast('Bitte Namen eingeben!', true); return; }
+  if (!min || !max || min >= max) { showToast('Gueltigen Bereich eingeben!', true); return; }
+  for (var i=0; i<exercises.length; i++) {
+    if (exercises[i].id === id) {
+      exercises[i].name = name;
+      exercises[i].min = min;
+      exercises[i].max = max;
+      exercises[i].step = step;
+      exercises[i].type = type;
+      break;
+    }
+  }
+  saveExercises();
+  document.getElementById('editExForm').style.display = 'none';
+  renderSettings(); updateLiveStats();
+  showToast(name + ' gespeichert!');
 }
 
 function toggleAddForm() {
-var f = document.getElementById(‘addExForm’);
-f.style.display = f.style.display === ‘none’ ? ‘block’ : ‘none’;
+  var f = document.getElementById('addExForm');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
 }
 
 function selectType(t) {
-newExType = t;
-document.getElementById(‘typeReps’).className = ‘type-btn’ + (t===‘reps’?’ sel’:’’);
-document.getElementById(‘typeSecs’).className = ‘type-btn’ + (t===‘secs’?’ sel’:’’);
+  newExType = t;
+  document.getElementById('typeReps').className = 'type-btn' + (t==='reps'?' sel':'');
+  document.getElementById('typeSecs').className = 'type-btn' + (t==='secs'?' sel':'');
 }
 
 function addExercise() {
-var name = document.getElementById(‘newExName’).value.trim();
-var min = parseInt(document.getElementById(‘newExMin’).value);
-var max = parseInt(document.getElementById(‘newExMax’).value);
-var step = parseInt(document.getElementById(‘newExStep’).value) || 1;
-if (!name) { showToast(‘Bitte Namen eingeben!’, true); return; }
-if (!min || !max || min >= max) { showToast(‘Gueltigen Bereich eingeben!’, true); return; }
-var id = ‘ex_’ + Date.now();
-var color = EX_COLORS[exercises.length % EX_COLORS.length];
-exercises.push({ id:id, name:name, type:newExType, min:min, max:max, step:step, active:true, color:color });
-saveExercises();
-document.getElementById(‘newExName’).value = ‘’;
-document.getElementById(‘newExMin’).value = ‘’;
-document.getElementById(‘newExMax’).value = ‘’;
-document.getElementById(‘newExStep’).value = ‘’;
-document.getElementById(‘addExForm’).style.display = ‘none’;
-renderSettings(); updateLiveStats();
-showToast(name + ’ hinzugefuegt!’);
+  var name = document.getElementById('newExName').value.trim();
+  var min = parseInt(document.getElementById('newExMin').value);
+  var max = parseInt(document.getElementById('newExMax').value);
+  var step = parseInt(document.getElementById('newExStep').value) || 1;
+  if (!name) { showToast('Bitte Namen eingeben!', true); return; }
+  if (!min || !max || min >= max) { showToast('Gueltigen Bereich eingeben!', true); return; }
+  var id = 'ex_' + Date.now();
+  var color = EX_COLORS[exercises.length % EX_COLORS.length];
+  exercises.push({ id:id, name:name, type:newExType, min:min, max:max, step:step, active:true, color:color });
+  saveExercises();
+  document.getElementById('newExName').value = '';
+  document.getElementById('newExMin').value = '';
+  document.getElementById('newExMax').value = '';
+  document.getElementById('newExStep').value = '';
+  document.getElementById('addExForm').style.display = 'none';
+  renderSettings(); updateLiveStats();
+  showToast(name + ' hinzugefuegt!');
 }
 
 // ── NOTIFICATIONS ─────────────────────────────────────────────────────────
 function requestNotifPermission() {
-if (!(‘Notification’ in window)) return;
-if (Notification.permission === ‘default’) {
-Notification.requestPermission(function(r) { if (r===‘granted’) showToast(‘Benachrichtigungen aktiviert!’); });
-}
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission(function(r) { if (r==='granted') showToast('Benachrichtigungen aktiviert!'); });
+  }
 }
 function scheduleNotif(secs) {
-if (window._notifTimer) clearTimeout(window._notifTimer);
-if (!(‘Notification’ in window) || Notification.permission !== ‘granted’) return;
-window._notifTimer = setTimeout(function() {
-try {
-var n = new Notification(‘Hourly Sets’, { body:‘Zeit fuer dein naechstes Set!’, tag:‘hourly-set’, requireInteraction:true });
-n.onclick = function() { window.focus(); n.close(); };
-} catch(e) {}
-}, secs * 1000);
+  if (window._notifTimer) clearTimeout(window._notifTimer);
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  window._notifTimer = setTimeout(function() {
+    try {
+      var n = new Notification('Hourly Sets', { body:'Zeit fuer dein naechstes Set!', tag:'hourly-set', requireInteraction:true });
+      n.onclick = function() { window.focus(); n.close(); };
+    } catch(e) {}
+  }, secs * 1000);
 }
 
 // ── BACKUP ────────────────────────────────────────────────────────────────
 function exportData() {
-var keys = getAllDayKeys();
-var data = { exercises: exercises, days: {} };
-for (var i=0; i<keys.length; i++) {
-try { data.days[keys[i]] = JSON.parse(localStorage.getItem(keys[i])); } catch(e) {}
-}
-var blob = new Blob([JSON.stringify(data)], { type:‘application/json’ });
-var url = URL.createObjectURL(blob);
-var a = document.createElement(‘a’);
-a.href = url; a.download = ‘hourlysets-’ + new Date().toISOString().slice(0,10) + ‘.json’;
-document.body.appendChild(a); a.click(); document.body.removeChild(a);
-URL.revokeObjectURL(url);
-showToast(‘Export gespeichert!’);
+  var keys = getAllDayKeys();
+  var data = { exercises: exercises, days: {} };
+  for (var i=0; i<keys.length; i++) {
+    try { data.days[keys[i]] = JSON.parse(localStorage.getItem(keys[i])); } catch(e) {}
+  }
+  var blob = new Blob([JSON.stringify(data)], { type:'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'hourlysets-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Export gespeichert!');
 }
 function importData(input) {
-var file = input.files[0]; if (!file) return;
-var reader = new FileReader();
-reader.onload = function(e) {
-try {
-var data = JSON.parse(e.target.result);
-var count = 0;
-// import exercises if present
-if (data.exercises) { localStorage.setItem(‘hs_exercises’, JSON.stringify(data.exercises)); }
-// import days
-if (data.days) {
-for (var key in data.days) { if (key.indexOf(‘hs_20’)===0) { localStorage.setItem(key, JSON.stringify(data.days[key])); count++; } }
-} else {
-// old format
-for (var key in data) { if (key.indexOf(‘hs_20’)===0) { localStorage.setItem(key, JSON.stringify(data[key])); count++; } }
-}
-showToast(count + ’ Tage importiert!’);
-setTimeout(function() { location.reload(); }, 1500);
-} catch(err) { showToast(‘Fehler beim Import!’, true); }
-};
-reader.readAsText(file); input.value = ‘’;
+  var file = input.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      var count = 0;
+      // import exercises if present
+      if (data.exercises) { localStorage.setItem('hs_exercises', JSON.stringify(data.exercises)); }
+      // import days
+      if (data.days) {
+        for (var key in data.days) { if (key.indexOf('hs_20')===0) { localStorage.setItem(key, JSON.stringify(data.days[key])); count++; } }
+      } else {
+        // old format
+        for (var key in data) { if (key.indexOf('hs_20')===0) { localStorage.setItem(key, JSON.stringify(data[key])); count++; } }
+      }
+      showToast(count + ' Tage importiert!');
+      setTimeout(function() { location.reload(); }, 1500);
+    } catch(err) { showToast('Fehler beim Import!', true); }
+  };
+  reader.readAsText(file); input.value = '';
 }
 function confirmClearAll() {
-if (confirm(‘ALLE Daten loeschen?’)) {
-var keys = getAllDayKeys();
-for (var i=0; i<keys.length; i++) localStorage.removeItem(keys[i]);
-localStorage.removeItem(‘hs_exercises’);
-location.reload();
-}
+  if (confirm('ALLE Daten loeschen?')) {
+    var keys = getAllDayKeys();
+    for (var i=0; i<keys.length; i++) localStorage.removeItem(keys[i]);
+    localStorage.removeItem('hs_exercises');
+    location.reload();
+  }
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────────────
 var toastTimer;
 function showToast(msg, urgent) {
-var el = document.getElementById(‘toast’);
-el.textContent = msg; el.className = ‘toast show’ + (urgent?’ urgent’:’’);
-clearTimeout(toastTimer);
-toastTimer = setTimeout(function() { el.classList.remove(‘show’); }, 3000);
-if (navigator.vibrate) navigator.vibrate(urgent ? [200,100,200] : [40]);
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast show' + (urgent?' urgent':'');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.classList.remove('show'); }, 3000);
+  if (navigator.vibrate) navigator.vibrate(urgent ? [200,100,200] : [40]);
 }
 
 // ── MANIFEST ──────────────────────────────────────────────────────────────
 function injectManifest() {
-try {
-var m = JSON.stringify({ name:‘Hourly Sets’, short_name:‘Sets’, start_url:’./’, display:‘standalone’, background_color:’#0a0a0c’, theme_color:’#0a0a0c’ });
-var blob = new Blob([m], { type:‘application/manifest+json’ });
-var link = document.createElement(‘link’); link.rel=‘manifest’; link.href=URL.createObjectURL(blob);
-document.head.appendChild(link);
-} catch(e) {}
+  try {
+    var m = JSON.stringify({ name:'Hourly Sets', short_name:'Sets', start_url:'./', display:'standalone', background_color:'#0a0a0c', theme_color:'#0a0a0c' });
+    var blob = new Blob([m], { type:'application/manifest+json' });
+    var link = document.createElement('link'); link.rel='manifest'; link.href=URL.createObjectURL(blob);
+    document.head.appendChild(link);
+  } catch(e) {}
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
 function init() {
-document.getElementById(‘dateDisplay’).textContent = new Date().toLocaleDateString(‘de-DE’,{weekday:‘short’,day:‘2-digit’,month:‘2-digit’,year:‘numeric’}).toUpperCase();
-injectManifest();
-loadExercises();
-// init currentVals
-for (var i=0; i<exercises.length; i++) {
-var ex = exercises[i];
-currentVals[ex.id] = Math.round((ex.min + ex.max) / 2 / ex.step) * ex.step;
-}
-if (!chartExId && exercises.length) chartExId = exercises[0].id;
-updateLiveStats();
-loadToday();
+  document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'}).toUpperCase();
+  injectManifest();
+  loadExercises();
+  // init currentVals
+  for (var i=0; i<exercises.length; i++) {
+    var ex = exercises[i];
+    currentVals[ex.id] = Math.round((ex.min + ex.max) / 2 / ex.step) * ex.step;
+  }
+  if (!chartExId && exercises.length) chartExId = exercises[0].id;
+  updateLiveStats();
+  loadToday();
 }
 init();
 </script>
-
+<div id="debugBox" style="display:none;position:fixed;bottom:60px;left:0;right:0;max-height:200px;overflow-y:auto;background:rgba(0,0,0,.95);border-top:2px solid #ff4f6d;z-index:9999;padding:10px;font-family:monospace;font-size:11px;color:#ff4f6d;"></div>
 </body>
 </html>
