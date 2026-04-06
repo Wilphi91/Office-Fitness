@@ -311,7 +311,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     </div>
   </div>
 </div>
-<script>
+<script charset="utf-8">
 window.onerror = function(msg, src, line, col, err) {
   var box = document.getElementById('debugBox');
   if (!box) return false;
@@ -320,7 +320,7 @@ window.onerror = function(msg, src, line, col, err) {
   return false;
 };
 
-// ── DEFAULT EXERCISES (legacy compatible) ─────────────────────────────────
+// -- DEFAULT EXERCISES (legacy compatible) ---------------------------------
 var DEFAULT_EXERCISES = [
   { id:'sq', name:'Squats',        type:'reps', min:10, max:20, step:1,  active:true,  color:'#e8ff47' },
   { id:'gm', name:'Good Mornings', type:'reps', min:10, max:20, step:1,  active:true,  color:'#47d4ff' },
@@ -328,7 +328,7 @@ var DEFAULT_EXERCISES = [
 ];
 var EX_COLORS = ['#e8ff47','#47d4ff','#ff4f6d','#b47fff','#ff9f47','#47ffb4','#ff47b4','#47b4ff'];
 
-// ── STATE ─────────────────────────────────────────────────────────────────
+// -- STATE -----------------------------------------------------------------
 var exercises = [];
 var currentVals = {};
 var sets = [];
@@ -342,7 +342,7 @@ var histDays = [];
 var chartExId = '';
 var newExType = 'reps';
 
-// ── STORAGE ───────────────────────────────────────────────────────────────
+// -- STORAGE ---------------------------------------------------------------
 function todayKey() { return 'hs_' + new Date().toISOString().slice(0,10); }
 function getAllDayKeys() {
   var keys = [];
@@ -383,7 +383,7 @@ function loadToday() {
   } catch(e) {}
 }
 
-// ── TABS ──────────────────────────────────────────────────────────────────
+// -- TABS ------------------------------------------------------------------
 function switchTab(tab) {
   var tabs = ['today','history','stats','settings'];
   for (var i=0; i<tabs.length; i++) {
@@ -399,7 +399,7 @@ function switchTab(tab) {
   if (tab === 'settings') renderSettings();
 }
 
-// ── PHASE ─────────────────────────────────────────────────────────────────
+// -- PHASE -----------------------------------------------------------------
 function showPhase(name) {
   var ps = ['panelStart','panelInput','panelTimer','panelSummary'];
   for (var i=0; i<ps.length; i++) document.getElementById(ps[i]).style.display = 'none';
@@ -410,7 +410,7 @@ function showPhase(name) {
 }
 function startInputPhase() { stopTimer(); renderInputRows(); showPhase('input'); }
 
-// ── EXERCISES ─────────────────────────────────────────────────────────────
+// -- EXERCISES -------------------------------------------------------------
 function activeExercises() {
   var out = [];
   for (var i=0; i<exercises.length; i++) { if (exercises[i].active) out.push(exercises[i]); }
@@ -421,7 +421,7 @@ function exById(id) {
   return null;
 }
 
-// ── INPUT ROWS ────────────────────────────────────────────────────────────
+// -- INPUT ROWS ------------------------------------------------------------
 function renderInputRows() {
   var active = activeExercises();
   // init currentVals with defaults
@@ -457,7 +457,7 @@ function changeVal(id, dir) {
   if (el) el.textContent = cur;
 }
 
-// ── LOG SET ───────────────────────────────────────────────────────────────
+// -- LOG SET ---------------------------------------------------------------
 function logSet() {
   var now = new Date();
   var active = activeExercises();
@@ -472,7 +472,7 @@ function logSet() {
   showToast('Set #' + sets.length + ' gespeichert!');
 }
 
-// ── LIVE STATS ────────────────────────────────────────────────────────────
+// -- LIVE STATS ------------------------------------------------------------
 function updateLiveStats() {
   var active = activeExercises();
   var totals = {};
@@ -498,7 +498,7 @@ function updateLiveStats() {
   document.getElementById('liveStats').innerHTML = html;
 }
 
-// ── TODAY LOG ─────────────────────────────────────────────────────────────
+// -- TODAY LOG -------------------------------------------------------------
 function renderTodayLog() {
   var el = document.getElementById('historyList');
   if (!sets.length) { el.innerHTML = '<div class="hist-empty">Noch keine Sets - los geht\'s!</div>'; return; }
@@ -534,7 +534,7 @@ function renderTodayLog() {
 
 function updateBadge() { document.getElementById('setsBadge').textContent = sets.length + ' SETS'; }
 
-// ── TIMER ─────────────────────────────────────────────────────────────────
+// -- TIMER -----------------------------------------------------------------
 var CIRC = 421;
 function startTimer(secs) {
   stopTimer();
@@ -586,7 +586,7 @@ function setCustomDuration(val) {
   for (var i=0; i<btns.length; i++) btns[i].className = 'timer-preset-btn';
 }
 
-// ── END DAY ───────────────────────────────────────────────────────────────
+// -- END DAY ---------------------------------------------------------------
 function confirmEnd() { if (confirm('Tag abschliessen?')) endDay(); }
 function endDay() { stopTimer(); phase = 'done'; showSummaryPanel(); saveToday(); }
 function showSummaryPanel() {
@@ -614,7 +614,7 @@ function showSummaryPanel() {
 }
 function resetDay() { if (confirm('Wirklich neu starten?')) { localStorage.removeItem(todayKey()); location.reload(); } }
 
-// ── HISTORY ───────────────────────────────────────────────────────────────
+// -- HISTORY ---------------------------------------------------------------
 function getDayTotals(d) {
   var totals = {};
   for (var i=0; i<exercises.length; i++) totals[exercises[i].id] = 0;
@@ -770,7 +770,7 @@ function showDayDetail(dateStr) {
   el.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-// ── STATS ─────────────────────────────────────────────────────────────────
+// -- STATS -----------------------------------------------------------------
 function renderStats() {
   var keys = getAllDayKeys();
   var totals = {};
@@ -808,7 +808,7 @@ function renderStats() {
   document.getElementById('allTimeStats').innerHTML = html;
 }
 
-// ── SETTINGS ──────────────────────────────────────────────────────────────
+// -- SETTINGS --------------------------------------------------------------
 function renderSettings() {
   var html = '';
   for (var i=0; i<exercises.length; i++) {
@@ -920,7 +920,7 @@ function addExercise() {
   showToast(name + ' hinzugefuegt!');
 }
 
-// ── NOTIFICATIONS ─────────────────────────────────────────────────────────
+// -- NOTIFICATIONS ---------------------------------------------------------
 function requestNotifPermission() {
   if (!('Notification' in window)) return;
   if (Notification.permission === 'default') {
@@ -938,7 +938,7 @@ function scheduleNotif(secs) {
   }, secs * 1000);
 }
 
-// ── BACKUP ────────────────────────────────────────────────────────────────
+// -- BACKUP ----------------------------------------------------------------
 function exportData() {
   var keys = getAllDayKeys();
   var data = { exercises: exercises, days: {} };
@@ -984,7 +984,7 @@ function confirmClearAll() {
   }
 }
 
-// ── TOAST ─────────────────────────────────────────────────────────────────
+// -- TOAST -----------------------------------------------------------------
 var toastTimer;
 function showToast(msg, urgent) {
   var el = document.getElementById('toast');
@@ -994,7 +994,7 @@ function showToast(msg, urgent) {
   if (navigator.vibrate) navigator.vibrate(urgent ? [200,100,200] : [40]);
 }
 
-// ── MANIFEST ──────────────────────────────────────────────────────────────
+// -- MANIFEST --------------------------------------------------------------
 function injectManifest() {
   try {
     var m = JSON.stringify({ name:'Hourly Sets', short_name:'Sets', start_url:'./', display:'standalone', background_color:'#0a0a0c', theme_color:'#0a0a0c' });
@@ -1004,7 +1004,7 @@ function injectManifest() {
   } catch(e) {}
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────
+// -- INIT ------------------------------------------------------------------
 function init() {
   document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'}).toUpperCase();
   injectManifest();
