@@ -8,7 +8,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Hourly Sets">
 <meta name="theme-color" content="#0a0a0c">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>Hourly Sets</title>
+<!-- v3.2 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;900&display=swap">
@@ -29,7 +32,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .top-badge{font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;color:#e8ff47;background:rgba(232,255,71,.08);border:1px solid rgba(232,255,71,.2);padding:4px 10px;letter-spacing:1px;}
 .live-stats{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
 .ls-card{background:#111116;border:1px solid #1e1e28;padding:8px 10px;text-align:center;position:relative;overflow:hidden;flex-shrink:0;min-width:76px;}
-.ls-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--ex-color,#e8ff47);}
+.ls-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:#e8ff47;}
 .ls-val{font-family:'Share Tech Mono','Courier New',monospace;font-size:19px;font-weight:700;color:#fff;line-height:1;}
 .ls-label{font-family:'Share Tech Mono','Courier New',monospace;font-size:7px;color:#4a4a5a;letter-spacing:1px;margin-top:3px;text-transform:uppercase;}
 .panel{background:#111116;border:1px solid #1e1e28;padding:16px;margin-bottom:12px;position:relative;}
@@ -483,7 +486,7 @@ for (var i=0; i<active.length; i++) {
 var ex = active[i];
 var val = totals[ex.id] || 0;
 var disp = ex.type === ‘secs’ ? val+‘s’ : String(val);
-html += ‘<div class="ls-card" style="--ex-color:'+ex.color+'">’;
+html += ‘<div class="ls-card"><div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:'+ex.color+';"></div>’;
 html += ‘<div class="ls-val">’+disp+’</div>’;
 html += ‘<div class="ls-label">’+ex.name+’</div>’;
 html += ‘</div>’;
